@@ -1,0 +1,38 @@
+- name: Create ElasticSerach Data Dir
+  file:
+    path="{{ es_data_dir }}"
+    state=directory
+    mode=0755
+    recurse=true
+    owner=root
+    group=docker
+
+- name: Create ElasticSerach Config Dir
+  file:
+    path="{{ es_config_dir }}"
+    state=directory
+    mode=0755
+    recurse=true
+    owner=root
+    group=docker
+
+
+- name: Create ElasticSerach Config Dir Scripts
+  file:
+    path="{{ es_config_dir }}/scripts"
+    state=directory
+    mode=0755
+    recurse=true
+    owner=root
+    group=docker
+
+
+- name: Create ElasticSerach Log Dir
+  file:
+    path="{{ es_log_dir }}"
+    state=directory
+    mode=0755
+    recurse=true
+    owner=root
+    group=docker
+

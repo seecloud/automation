@@ -1,0 +1,20 @@
+- name: ElasticSearch Container
+  docker:
+    name: elasticsearch
+    image: library/elasticsearch
+    state: reloaded
+    pull: always
+    ports:
+    - "{{ ansible_default_ipv4['address'] }}:9200:9200"
+    - "{{ ansible_default_ipv4['address'] }}:9300:9300"
+    - "{{ ansible_default_ipv4['address'] }}:9200:9200/udp"
+    - "{{ ansible_default_ipv4['address'] }}:9300:9300/udp"
+
+    extra_hosts:
+      es-node-1: "{{ hostvars['node-1']['ansible_default_ipv4']['address'] }}"
+      es-node-2: "{{ hostvars['node-2']['ansible_default_ipv4']['address'] }}"
+      es-node-3: "{{ hostvars['node-3']['ansible_default_ipv4']['address'] }}"
+    volumes:
+    - "{{ es_data_dir }}:/usr/share/elasticsearch/data"
+    - "{{ es_config_dir }}:/usr/share/elasticsearch/config"
+    - "{{ es_log_dir }}:/usr/share/elasticsearch/log"

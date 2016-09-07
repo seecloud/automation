@@ -1,0 +1,5 @@
+- name: DockerPy
+  become: true
+  pip:
+    state=present
+    name=docker-compose

@@ -1,0 +1,5 @@
+- name: PreCheck
+  vars:
+    num_hosts: "{{ groups['elasticsearch_nodes'] | length }}"
+  fail: msg="The number of nodes must be exactly 3!"
+  when: num_hosts | int != 3
