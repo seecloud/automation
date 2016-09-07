@@ -2,10 +2,10 @@
 
 - include: 000_pre_check.yaml
 
-- include 100_create_dirs.yaml
+- include: 100_create_dirs.yaml
 
-- include 110_config_files.yaml
+- include: 110_config_files.yaml
 
-- include 130_docker_python_libs.yaml
+- include: 130_docker_python_libs.yaml
 
-- include 150_elastic_search_docker_container.yaml
+- include: 150_elastic_search_docker_container.yaml
