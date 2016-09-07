@@ -1,0 +1,9 @@
+- name: Inastall python-apt
+  apt: name={{ item }}
+  with_items:
+    - python-apt
+    - python-pip
+- name: Update apt cache
+  apt: update_cache=yes
+  sudo: yes
+

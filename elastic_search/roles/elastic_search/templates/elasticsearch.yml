@@ -1,0 +1,12 @@
+#network.host:  0.0.0.0
+cluster.name: production
+node.name: ${HOSTNAME}
+discovery.zen.ping.unicast.hosts: ["{{  hostvars["node-1"]["ansible_default_ipv4"]["address"] }}", "{{  hostvars["node-2"]["ansible_default_ipv4"]["address"] }}", "{{  hostvars["node-3"]["ansible_default_ipv4"]["address"] }}"]
+discovery.zen.minimum_master_nodes: 2
+
+network.bind_host: 0.0.0.0
+network.publish_host: {{ ansible_default_ipv4["address"] }}
+http.publish_host: {{ ansible_default_ipv4["address"] }}
+
+#publish_host: {{ ansible_default_ipv4["address"] }}
+
