@@ -1,0 +1,4 @@
+---
+# tasks file for common
+  - name: Update hosts with registry address
+    lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'

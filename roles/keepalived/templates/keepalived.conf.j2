@@ -1,0 +1,29 @@
+ ! Managed by ansible
+global_defs {
+}
+vrrp_script {{ keepalived_vrrp_check }} {
+        script "/usr/bin/killall -0 {{ keepalived_check_process }} "     # replace later with http check on registry api
+        interval 2
+        weight 2
+}
+vrrp_instance docker_registry {
+    state {{ keepalived_state.upper() }}
+    interface {{ keepalived_iface }}
+    virtual_router_id {{ keepalived_vr_id  }}
+    {% if keepalived_state == "master" %}
+    priority {{ keepalived_master_priority }}
+    {% else %}
+    priority {{ keepalived_backup_priority }}
+    {% endif %}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass {{ keepalived_auth_pass }}
+    }
+    virtual_ipaddress {
+        {{ docker_registry_ip }} dev {{ keepalived_iface }} label {{ keepalived_iface }}:0
+    }
+        track_script {
+            {{ keepalived_vrrp_check }}
+        }
+}

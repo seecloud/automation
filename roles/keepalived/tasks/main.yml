@@ -1,0 +1,19 @@
+---
+# tasks file for keepalived
+
+- name: Install keepalived
+  command: dpkg -i {{item}} chdir={{ keepalived_dependencies_path }}
+  with_items:
+    - ipvsadm_1.26-2ubuntu1_amd64.deb
+    - iproute-dev_20111117-1ubuntu2.3_amd64.deb
+    - keepalived_1.2.2-3ubuntu1_amd64.deb
+  tags: keepalived
+
+- name: Configure keepalived
+  template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
+  tags: keepalived
+  notify: restart keepalived
+
+- name: Start keepalived
+  service: name=keepalived state=running
+  tags: keepalived

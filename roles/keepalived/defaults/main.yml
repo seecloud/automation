@@ -1,0 +1,12 @@
+---
+# defaults file for keepalived
+keepalived_state: "master"
+keepalived_iface: "eth0"
+keepalived_vr_id: 5
+keepalived_master_priority: "101"
+keepalived_backup_priority: "100"
+keepalived_auth_pass: "default_pass"
+keepalived_vrrp_check: "docker_registry"
+keepalived_check_process: "dockerd"
+keepalived_dependencies_path: "/opt/msa_install/packages"
+

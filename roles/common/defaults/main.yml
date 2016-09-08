@@ -1,0 +1,4 @@
+---
+# defaults file for common
+docker_registry_name: "registry"
+docker_registry_ip: "192.168.122.250"
