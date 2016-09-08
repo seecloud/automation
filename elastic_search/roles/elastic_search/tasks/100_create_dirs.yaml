@@ -3,18 +3,18 @@
     path="{{ es_data_dir }}"
     state=directory
     mode=0755
-    recurse=true
-    owner=root
-    group=docker
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"
+#    recurse=true
 
 - name: Create ElasticSerach Config Dir
   file:
     path="{{ es_config_dir }}"
     state=directory
     mode=0755
-    recurse=true
-    owner=root
-    group=docker
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"
+#    recurse=true
 
 
 - name: Create ElasticSerach Config Dir Scripts
@@ -22,17 +22,15 @@
     path="{{ es_config_dir }}/scripts"
     state=directory
     mode=0755
-    recurse=true
-    owner=root
-    group=docker
-
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"
+#    recurse=true
 
 - name: Create ElasticSerach Log Dir
   file:
     path="{{ es_log_dir }}"
     state=directory
     mode=0755
-    recurse=true
-    owner=root
-    group=docker
-
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"
+#    recurse=true

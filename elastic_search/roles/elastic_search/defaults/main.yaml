@@ -1,0 +1,4 @@
+---
+# defaults file for common
+elastic_search_user_id: 105
+elastic_search_group_id: 108
