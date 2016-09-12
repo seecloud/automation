@@ -3,7 +3,7 @@ node.name: ${HOSTNAME}
 
 discovery.zen.ping.unicast.hosts: [ {{ nodes_ip_addr_list|join(', ')}} ]
 
-discovery.zen.minimum_master_nodes: 2
+discovery.zen.minimum_master_nodes: {{ nod_quorum }}
 
 network.bind_host: 0.0.0.0
 network.publish_host: {{ ansible_default_ipv4["address"] }}

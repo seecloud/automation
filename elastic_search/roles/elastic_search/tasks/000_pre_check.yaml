@@ -1,7 +1,10 @@
 - set_fact:
     num_hosts: "{{ groups['elasticsearch_nodes'] | length }}"
 
-#- debug: var=num_hosts
+- set_fact:
+    nod_quorum: "{{ (((num_hosts|int)/2)+1)|int  }}"
+
+- debug: var=nod_quorum
 
 - set_fact:
     is_even: "{{ ( num_hosts | int ) is even }}"

@@ -2,8 +2,8 @@
 - name: pre
   shell: "echo 123"
 
-- name: Test
-  shell: echo {{  hostvars["node-2"]['ansible_default_ipv4']['address'] }} > /tmp/a1 
+#- name: Test
+#  shell: echo {{  hostvars["node-2"]['ansible_default_ipv4']['address'] }} > /tmp/a1 
 
 #     {% for host in groups['app_servers'] %}
 #       {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}

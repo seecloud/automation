@@ -1,9 +1,13 @@
-- name: Inastall python-apt
-  apt: name={{ item }}
-  with_items:
-    - python-apt
-    - python-pip
-- name: Update apt cache
-  apt: update_cache=yes
-  sudo: yes
+#- name: Inastall python-apt
+#  apt: name={{ item }}
+#  with_items:
+
+#- name: Inastall python-apt
+#  apt: name={{ item }}  update_cache=yes  allow_unauthenticated=true
+#  with_items:
+#    - python-apt
+#    - python-pip
+
+#- name: Update apt cache
+#  apt: update_cache=yes, allow_unauthenticated=true
 
