@@ -5,6 +5,8 @@ vrrp_script {{ keepalived_vrrp_check }} {
         script "/usr/bin/killall -0 {{ keepalived_check_process }} "     # replace later with http check on registry api
         interval 2
         weight 2
+        fail 2
+        rise 2
 }
 vrrp_instance docker_registry {
     state {{ keepalived_state.upper() }}
