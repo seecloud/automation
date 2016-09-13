@@ -4,11 +4,19 @@
   - name: Ensure certs directory on host exist
     file: path={{ registry_certs_path }} state=directory
 
+  - name: Update ssl configuration
+    blockinfile:
+      dest: /etc/ssl/openssl.cnf 
+      block: |
+        [ alternate_names ]
+        DNS.1        = registry
+
   - name: Update openssl settings - allow AltNames
     lineinfile: >
       dest=/etc/ssl/openssl.cnf 
       insertafter="^\[ v3_ca \]"
-      line="subjectAltName = IP:{{ docker_registry_ip }}"
+      line="subjectAltName = @alternate_names"
+
 
   - name: Generate certs for registry TLS support
     shell: >

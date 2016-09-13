@@ -19,9 +19,9 @@
     with_items: '{{ docker_images.stdout_lines }}'
 
   - name: Tag image for private registry
-    shell: 'docker tag {{ item }} {{ docker_registry_ip }}:5000/{{ item }}:latest'
+    shell: 'docker tag {{ item }} {{ container_address }}/{{ item }}:latest'
     with_items: '{{ docker_images.stdout_lines }}'
 
   - name: Push images to private registry # for using push from docker_image - ansible 2.2 required
-    shell: 'docker push {{ docker_registry_ip }}:5000/{{ item }}:latest'
+    shell: 'docker push {{ container_address }}/{{ item }}:latest'
     with_items: '{{ docker_images.stdout_lines }}'
