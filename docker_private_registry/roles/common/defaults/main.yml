@@ -9,5 +9,5 @@ docker_registry_name: "registry"
 docker_registry_ip: "192.168.122.250"
 
 # temporary for testing
-msa_files_src: "/home/vstoiko/dev/projects/managed_services/repos/msa_files"
+msa_files_src: "/home/vstoiko/dev/projects/managed_services/repos/ansible"
 msa_files_dest: "/opt/"

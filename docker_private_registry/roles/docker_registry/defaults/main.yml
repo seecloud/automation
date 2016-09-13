@@ -13,4 +13,5 @@ company_country: "US"
 registry_role: "undefined"
 
 #docker
-docker_registry_tar: "registry.tar"
+docker_registry_tar: "/opt/ansible/docker_private_registry/roles/docker_registry/files/registry.tar"
+docker_custom_tars_path: "/opt/ansible/docker_private_registry/roles/docker_registry/files/custom"

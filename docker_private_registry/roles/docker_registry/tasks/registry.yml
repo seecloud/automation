@@ -17,6 +17,9 @@
       -out {{ registry_certs_path }}/{{ key_name }}.crt
       -subj '/CN={{ container_address }}/O={{ company_name }}/C={{  company_country }}'
 
+  - name: "Deploy certificate for server"
+    shell: 'cp {{ registry_certs_path }}/{{ key_name }}.crt /etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
+
   - name: Ensure registry container removed before running new
     docker_container:
       name: registry
@@ -26,7 +29,6 @@
     docker_image:
       name: registry
       state: absent
-
 
   - name: Load docker registry image from tar
     shell: 'docker load < {{ docker_registry_tar }}'

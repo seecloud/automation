@@ -5,7 +5,12 @@
   include: registry.yml
   when: registry_role == "server"
 
+- name: "Load custom images"
+  include: images.yml
+  when: registry_role == "server"
+
 - name: "Deploy docker registry certificates"
   include: client.yml
   when: registry_role == "client"
   delegate_to: '{{ docker_registry_ip }}'
+
