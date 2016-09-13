@@ -1,0 +1,42 @@
+---
+# tasks file for docker_registry
+
+  - name: Ensure certs directory on host exist
+    file: path={{ registry_certs_path }} state=directory
+
+  - name: Update openssl settings - allow AltNames
+    lineinfile: >
+      dest=/etc/ssl/openssl.cnf 
+      insertafter="^\[ v3_ca \]"
+      line="subjectAltName = IP:{{ docker_registry_ip }}"
+
+  - name: Generate certs for registry TLS support
+    shell: >
+      openssl req -newkey rsa:{{ key_length }} -nodes -sha256
+      -keyout {{ registry_certs_path }}/{{ key_name }}.key -x509 -days {{ valid_time }}
+      -out {{ registry_certs_path }}/{{ key_name }}.crt
+      -subj '/CN={{ container_address }}/O={{ company_name }}/C={{  company_country }}'
+
+  - name: Ensure registry container removed before running new
+    docker_container:
+      name: registry
+      state: absent
+
+  - name: Ensure registry image removed before running new
+    docker_image:
+      name: registry
+      state: absent
+
+
+  - name: Load docker registry image from tar
+    shell: 'docker load < {{ docker_registry_tar }}'
+
+  - name: Run docker registry
+    shell: >
+      docker run -d -p 5000:5000 
+      --restart=always 
+      --name registry   
+      -v /{{ registry_certs_path }}:/certs   
+      -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt   
+      -e REGISTRY_HTTP_TLS_KEY=/certs/{{ key_name }}.key registry
+

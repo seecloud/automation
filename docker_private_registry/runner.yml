@@ -1,17 +1,21 @@
 ---
+- hosts: test
+  roles:
+      - common
+
 - hosts: 192.168.122.3
   roles:
-     - common
      - { role: keepalived, keepalived_state: "master" }
 
 - hosts: 192.168.122.4
   roles:
-     - common
      - { role: keepalived, keepalived_state: "backup" }
+
+
+- hosts: 192.168.122.3
+  roles:
+      - { role: docker_registry, registry_role: "server"}
 
 - hosts: test
   roles:
-      - common
-  tasks:
-    - name: Update hosts with registry address
-      lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'
+      - { role: docker_registry, registry_role: "client"}

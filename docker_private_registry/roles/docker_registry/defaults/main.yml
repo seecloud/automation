@@ -1,0 +1,16 @@
+---
+# defaults file for docker_registry
+# certificates options
+registry_certs_path: "/etc/ssl/certs"
+container_address: "{{ docker_registry_ip }}:5000"
+key_length: "4096"
+key_name: "msa"
+valid_time: "365"
+company_name: "Test company"
+company_country: "US"
+
+# deployment type
+registry_role: "undefined"
+
+#docker
+docker_registry_tar: "registry.tar"
