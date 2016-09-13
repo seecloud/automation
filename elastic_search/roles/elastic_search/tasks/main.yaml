@@ -6,6 +6,6 @@
 
 - include: 110_config_files.yaml
 
-- include: 130_docker_python_libs.yaml
+#- include: 130_docker_python_libs.yaml
 
 - include: 150_elastic_search_docker_container.yaml

@@ -34,3 +34,11 @@
     owner="{{ elastic_search_user_id }}"
     group="{{ elastic_search_group_id }}"
 #    recurse=true
+
+- name: Create ElasticSerach Plugins dir
+  file:
+    path="{{ es_plugins_dir }}"
+    state=directory
+    mode=0755
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"
