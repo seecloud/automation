@@ -4,6 +4,6 @@
   roles:
       - { role: docker_registry, registry_role: "server"}
 
-- hosts: test
+- hosts: all
   roles:
       - { role: docker_registry, registry_role: "client"}

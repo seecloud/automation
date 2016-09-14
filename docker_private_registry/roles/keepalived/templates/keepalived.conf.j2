@@ -2,7 +2,7 @@
 global_defs {
 }
 vrrp_script {{ keepalived_vrrp_check }} {
-        script "/usr/bin/killall -0 {{ keepalived_check_process }} "    
+        script "pidof {{ keepalived_check_process }}"
         interval 2
         weight 2
         fail 2

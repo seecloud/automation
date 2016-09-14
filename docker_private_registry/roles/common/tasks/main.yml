@@ -6,6 +6,8 @@
     when: hostvars[item].ansible_default_ipv4.address is defined
     with_items: groups['all']
 
+  - name: Update resolv.conf # neede only for temporary keepalived
+    lineinfile: dest=/etc/resolv.conf line='nameserver 8.8.8.8'
 
   - name: Creates temporary working directory
     file: path={{ temp_working_dir }} state=directory
@@ -37,3 +39,6 @@
 
   - name: Update hosts with registry address
     lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'
+
+  - name: Ensure certs directory for registry exists
+    file: path=/etc/docker/certs.d/{{ docker_registry_name }}:5000 state=directory recurse=yes

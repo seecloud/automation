@@ -1,21 +1,21 @@
 ---
-- hosts: test
+- hosts: all
   roles:
       - common
 
-- hosts: 192.168.122.3
+- hosts: pr1
   roles:
      - { role: keepalived, keepalived_state: "master" }
 
-- hosts: 192.168.122.4
+- hosts: pr2
   roles:
      - { role: keepalived, keepalived_state: "backup" }
 
-- hosts: 192.168.122.3
+- hosts: pr1
   roles:
       - { role: docker_registry, registry_role: "server"}
 
-- hosts: test
+- hosts: all
   roles:
       - { role: docker_registry, registry_role: "client"}
 
