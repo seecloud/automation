@@ -27,7 +27,7 @@
     authorized_key: user=root key="{{ lookup('file', '{{ temp_working_dir  }}/{{ ssh_keypair_name }}.pub') }}"
 
   - name: Copy repository with images/playbooks # this is temporary - run once on new environment
-    copy: src='{{ msa_files_src }}' dest='{{ msa_files_dest }}' owner={{ default_user }} group={{ default_user }} mode=0644 force=no
+    copy: src='{{ msa_files_src }}' dest='{{ msa_files_dest }}' owner={{ default_user }} group={{ default_user }} mode=0644
 
   - name: Update hosts with registry address
     lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'

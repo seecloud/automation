@@ -2,7 +2,7 @@
 global_defs {
 }
 vrrp_script {{ keepalived_vrrp_check }} {
-        script "/usr/bin/killall -0 {{ keepalived_check_process }} "     # replace later with http check on registry api
+        script "/usr/bin/killall -0 {{ keepalived_check_process }} "    
         interval 2
         weight 2
         fail 2
@@ -28,4 +28,5 @@ vrrp_instance docker_registry {
         track_script {
             {{ keepalived_vrrp_check }}
         }
+    notify_master "{{ keepalived_notify_script }} MASTER"
 }

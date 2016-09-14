@@ -1,6 +1,9 @@
 ---
 # tasks file for docker_registry
 
+- name: Include common vars
+  include_vars: roles/common/defaults/main.yml
+
 - name: "Deploy docker registry"
   include: registry.yml
   when: registry_role == "server"
