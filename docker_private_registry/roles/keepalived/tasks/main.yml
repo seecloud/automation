@@ -1,5 +1,11 @@
 ---
 # tasks file for keepalived
+- name: Ensure registry folder exists
+  file: path='{{ registry_dest }}' state=directory
+
+- name: Copy docker_registry playbook/inventory/runner
+  copy: src='{{ playbook_dir }}' dest='{{ registry_dest }}'
+
 - name: Include common vars
   include_vars: roles/common/defaults/main.yml
 

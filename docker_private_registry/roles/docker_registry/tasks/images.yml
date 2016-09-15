@@ -6,11 +6,8 @@
     register: docker_images
     always_run: true
 
-  - name: Ensure registry image removed before running new
-    docker_image:
-      name: '{{ item }}'
-      state: absent
-    with_items: '{{ docker_images.stdout_lines }}'
+  - name: Debug
+    debug: var=docker_images
 
   - name: Load image from archive
     docker_image:

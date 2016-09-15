@@ -31,7 +31,7 @@
     shell: 'cp {{ registry_certs_path }}/{{ key_name }}.crt /etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
 
   - name: Ensure docker runner
-    service: name=docker state=restarted
+    service: name=docker state=started
 
   - name: Ensure registry container removed before running new
     docker_container:
@@ -43,6 +43,7 @@
       name: registry
       state: absent
     ignore_errors: yes
+    notify: restart docker
 
   - name: Load docker registry image from tar
     shell: 'docker load < {{ docker_registry_tar }}'

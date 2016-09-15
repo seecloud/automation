@@ -8,5 +8,7 @@ keepalived_backup_priority: "100"
 keepalived_auth_pass: "default_pass"
 keepalived_vrrp_check: "docker_registry"
 keepalived_check_process: "dockerd"
-keepalived_notify_script: "/opt/ansible/docker_private_registry/roles/docker_registry/files/notify.sh"
+keepalived_notify_script: "/opt/docker_private_registry/roles/docker_registry/files/notify.sh"
 
+# registry role path - only for keepalived nodes
+registry_dest: "/opt"

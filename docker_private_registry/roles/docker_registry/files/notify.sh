@@ -17,9 +17,9 @@ case $ENDSTATE in
               ;;
     "MASTER") # Perform action for transition to MASTER state
 			  logger Deploying docker private registry
-              ANSIBLE_HOST_KEY_CHECKING=False /usr/bin/ansible-playbook -i /opt/ansible/docker_private_registry/inventory /opt/ansible/docker_private_registry/notify_runner.yml
+              ANSIBLE_HOST_KEY_CHECKING=False /usr/bin/ansible-playbook -i /opt/docker_private_registry/inventory /opt/docker_private_registry/notify_runner.yml
               ;;
-    *)        echo "Unknown state ${ENDSTATE} for VRRP ${TYPE} ${NAME}"
+    *)        echo "Unknown state ${ENDSTATE}"
               exit 1
               ;;
 esac

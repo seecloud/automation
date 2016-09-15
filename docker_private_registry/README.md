@@ -74,6 +74,12 @@ Example
       - { role: docker_registry, registry_role: "client"}
 ```
 
+5. Run playbook
+```
+cd docker_private_registry/
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory init_runner.yml
+```
+
 After deployment you can use registry in this way:
 ```
 docker pull registry:5000/elasticsearch
