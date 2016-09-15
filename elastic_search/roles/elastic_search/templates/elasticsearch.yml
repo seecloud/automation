@@ -14,3 +14,5 @@ http.publish_host: {{ ansible_default_ipv4["address"] }}
 #publish_host: {{ ansible_default_ipv4["address"] }}
 #network.host:  0.0.0.0
 
+index.number_of_shards: 2
+index.number_of_replicas:  {{ nod_quorum }}
