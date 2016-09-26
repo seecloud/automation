@@ -1,2 +1,10 @@
 ---
- - include:  000_hosts.yaml
+ - include: 000_hosts.yaml
+
+ - include: 000_pre_check.yaml
+
+ - include: 110_install_gluster_pkg.yaml
+
+ - include: 120_create_dirs.yaml
+
+ - include: 130_gluster_add_bricks.yaml

@@ -1,1 +1,2 @@
 ---
+gluster_storage_dir: "/gluster_storage"

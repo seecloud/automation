@@ -1,0 +1,22 @@
+#{% for host in play_hosts %}
+#{% if 'ansible_eth0' in hostvars[host] %}
+#{{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}  {{ host }}
+#{% endif %}
+#{% endfor %}
+
+- set_fact:
+    num_hosts: "{{ play_hosts | length }}"
+
+- debug: var=play_hosts
+
+#- set_fact:
+#    is_even: "{{ ( num_hosts | int ) is even }}"
+#
+#- debug: var=is_even
+
+
+- name: PreCheck_NodesNumber
+  fail: msg="The number of nodes must be exactly 3!"
+  when: num_hosts | int != 3
+
+
