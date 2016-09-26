@@ -42,3 +42,11 @@
     mode=0755
     owner="{{ elastic_search_user_id }}"
     group="{{ elastic_search_group_id }}"
+
+- name: Create ElasticSerach Backup dir
+  file:
+    path="{{ es_backup_dir }}"
+    state=directory
+    mode=0755
+    owner="{{ elastic_search_user_id }}"
+    group="{{ elastic_search_group_id }}"

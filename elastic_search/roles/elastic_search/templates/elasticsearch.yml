@@ -16,3 +16,6 @@ http.publish_host: {{ ansible_default_ipv4["address"] }}
 
 index.number_of_shards: 2
 index.number_of_replicas:  {{ nod_quorum }}
+
+
+path.repo: "/usr/share/elasticsearch/backups"
