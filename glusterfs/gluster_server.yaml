@@ -1,0 +1,4 @@
+---
+- hosts: glusterfs_nodes
+  roles:
+    - { role: glusterfs_server }
