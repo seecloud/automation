@@ -1,2 +1,0 @@
-- name: restart_elasticsearch_docker
-  command: /usr/bin/docker stop elasticsearch && /usr/bin/docker stop elasticsearch
