@@ -1,0 +1,10 @@
+---
+elastic_search_user_id: 105
+elastic_search_group_id: 108
+
+es_data_dir:    '/volumes/es_data_dir'
+es_config_dir:  '/volumes/es_config_dir'
+es_log_dir:     '/volumes/es_log_dir'
+es_plugins_dir: '/volumes/es_plugins_dir'
+es_backup_dir:  '/volumes/es_backup_dir'
+es_docker_image: 'library/elasticsearch'
