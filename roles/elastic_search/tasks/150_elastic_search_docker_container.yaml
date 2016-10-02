@@ -1,0 +1,17 @@
+- name: ElasticSearch Container
+  docker:
+    name: elasticsearch
+    image: "{{ es_docker_image }}"
+#    state: started
+    state: reloaded
+    pull: missing
+    net: bridge
+    ports:
+    - "{{ ansible_default_ipv4['address'] }}:9200:9200"
+    - "{{ ansible_default_ipv4['address'] }}:9300:9300"
+    volumes:
+    - "{{ es_data_dir }}:/usr/share/elasticsearch/data"
+    - "{{ es_config_dir }}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+    - "{{ es_log_dir }}:/usr/share/elasticsearch/log"
+    - "{{ es_plugins_dir }}:/usr/share/elasticsearch/plugins"
+    - "{{ es_backup_dir }}:/usr/share/elasticsearch/backups"

@@ -1,0 +1,6 @@
+---
+ - include: 110_install_gluster_pkg.yaml
+
+ - include: 120_create_dirs.yaml
+
+ - include: 130_glusterfs_mount_volumes.yaml

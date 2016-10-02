@@ -1,0 +1,2 @@
+- name: Put public key into authorized_keys for root
+  authorized_key: user=root key="{{ lookup('file', '{{ temp_working_dir  }}/{{ ssh_keypair_name }}.pub') }}"

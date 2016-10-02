@@ -1,0 +1,2 @@
+- name: Ensure user ssh dir exists
+  file: path='{{ user_home }}/.ssh' state=directory

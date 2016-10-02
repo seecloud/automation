@@ -1,0 +1,42 @@
+---
+# tasks file for keepalived
+#- name: Ensure registry folder exists
+#  file: path='{{ registry_dest }}' state=directory
+
+#- name: Copy docker_registry playbook/inventory/runner
+#  copy: src='{{ playbook_dir }}' dest='{{ registry_dest }}'
+
+- debug: var=playbook_dir
+
+#- name: Include common vars
+#  include_vars: roles/common/defaults/main.yml
+
+#- name: Ensure notify script is executable
+#  file: path={{ keepalived_notify_script }} mode=0744
+
+#- set_fact:
+#    notify_script_dir: "{{ keepalived_notify_script|dirname }}"
+
+
+#- debug: var=notify_script_dir
+#
+#- name: Create notify script dir
+#  file:
+#    path="{{ keepalived_notify_script|dirname }}"
+#    state=directory
+#    mode=0755
+#    recurse=true
+
+
+#- name: Ensure notify script is executable
+#  template:
+#    src=templates/keepalived.conf.j2
+#    dest="{{ keepalived_notify_script }}"
+#    owner=root
+#    mode=0744
+
+- include: 100_install_keepalived.yaml
+
+- include: 110_configure_keepalived.yaml
+
+- include: 120_start_keepalived.yaml
