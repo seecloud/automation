@@ -9,8 +9,31 @@
 - name: Include common vars
   include_vars: roles/common/defaults/main.yml
 
+#- name: Ensure notify script is executable
+#  file: path={{ keepalived_notify_script }} mode=0744
+
+- set_fact:
+    notify_script_dir: "{{ keepalived_notify_script|dirname }}"
+#"{% set IP_ARR=[] %}{% for host in groups['elasticsearch_nodes'] %}{% if IP_ARR.insert(loop.index,hostvars[host]['ansible_default_ipv4']['address']) %}{% endif %}{%
+
+
+- debug: var=notify_script_dir
+
+- name: Create notify script dir
+  file:
+    path="{{ keepalived_notify_script|dirname }}"
+    state=directory
+    mode=0755
+    recurse=true
+
+
 - name: Ensure notify script is executable
-  file: path={{ keepalived_notify_script }} mode=0744
+  template: path= mode=0744
+  template:
+    src=templates/keepalived.conf.j2
+    dest="{{ keepalived_notify_script }}"
+    owner=root
+    mode=0744
 
 - name: Install keepalived
   apt: name=keepalived state=present # requires internet for now

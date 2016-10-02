@@ -8,7 +8,6 @@
   template:
     src=templates/elasticsearch.yml
     dest="{{ es_config_dir }}/elasticsearch.yml"
-    owner=root
     owner="{{ elastic_search_user_id }}"
     group="{{ elastic_search_group_id }}"
     mode=0755
