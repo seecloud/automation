@@ -1,7 +1,7 @@
 - name: ElasticSearch Container
   docker:
     name: elasticsearch
-    image: library/elasticsearch
+    image: "{{ es_docker_image }}"
 #    state: started
     state: reloaded
     pull: missing

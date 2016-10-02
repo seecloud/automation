@@ -13,6 +13,6 @@
     rebalance=no
     transport=tcp
     replicas={{ num_hosts  }}
-    options='{storage.owner-uid: 105, storage.owner-gid 108}'
+    options='{ storage.owner-uid 105, storage.owner-gid 108 }'
   run_once: true
 

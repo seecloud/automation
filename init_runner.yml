@@ -1,0 +1,31 @@
+---
+- hosts: all
+  roles:
+      - common
+
+- hosts: pr1
+  roles:
+     - { role: keepalived, keepalived_state: "master" }
+
+- hosts: pr2
+  roles:
+     - { role: keepalived, keepalived_state: "backup" }
+
+- hosts: pr1
+  roles:
+      - { role: docker_registry, registry_role: "server"}
+
+#- hosts: all
+#  roles:
+#      - { role: docker_registry, registry_role: "client"}
+#
+#
+#- hosts: glusterfs_nodes
+#  roles:
+#    - { role: glusterfs_server }
+#
+#- hosts: elasticsearch_nodes
+#  roles:
+#    - { role: elastic_search, es_data_dir: '/volumes/es_data_dir',  es_config_dir: '/volumes/es_config_dir',  es_log_dir: '/volumes/es_log_dir', es_backup_dir: '/volumes/es_backup_dir',  es_docker_image: 'registry:5000/elasticsearch' }
+#
+#
