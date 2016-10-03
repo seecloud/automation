@@ -1,7 +1,15 @@
-- name: Create mount point
+- name: Create mount point for Elastic Search
   file:
-    path: "{{ gluster_mount_point }}"
+    path: "{{ glusterfs_elastic_search_mount_point }}"
     state: directory
     mode: 0755
-    owner: "{{ gluster_mount_point_user_id }}"
-    group: "{{ gluster_mount_point_group_id }}"
+    owner: "{{ glusterfs_elastic_search_mount_point_user_id }}"
+    group: "{{ glusterfs_elastic_search_mount_point_group_id }}"
+
+- name: Create mount point for Docker Registry
+  file:
+    path: "{{ glusterfs_docker_registry_mount_point }}"
+    state: directory
+    mode: 0755
+    owner: "{{ glusterfs_docker_registry_mount_point_user_id }}"
+    group: "{{ glusterfs_docker_registry_mount_point_group_id }}"

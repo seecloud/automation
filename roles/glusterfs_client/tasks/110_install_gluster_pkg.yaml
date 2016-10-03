@@ -1,5 +1,3 @@
-- debug: var=gluster_mount_point
-
 - name: Update apt cache
   apt: update_cache=yes
   sudo: yes

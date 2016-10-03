@@ -77,3 +77,19 @@
       -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt
       -e REGISTRY_HTTP_TLS_KEY=/certs/{{ key_name }}.key registry
 
+
+#### gaff example
+#registry:
+#  image: registry
+#  restart: always
+#  hostname: go.gaff.io
+#  domainname: https://github.com/gocd/gocd-docker.git
+#  ports:
+#    - 127.0.0.1:5000:5000
+#  volumes:
+#    - /VOLUMES/registry/workdir/:/var/lib/registry
+#  environment:
+#    - REGISTRY_STORAGE_DELETE_ENABLED=True
+#
+
+

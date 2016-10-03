@@ -1,3 +1,11 @@
 ---
-gluster_mount_point: "/mnt"
-glusterfs_volume_name: "glusterfs_volume"
+glusterfs_elastic_search_mount_point:          "/mnt/es"
+glusterfs_elastic_search_mount_point_user_id:  "105"
+glusterfs_elastic_search_mount_point_group_id: "108"
+glusterfs_elastic_search_volume_name:          "es"
+
+
+glusterfs_docker_registry_mount_point:          "/mnt/dr"
+glusterfs_docker_registry_mount_point_user_id:  "0"
+glusterfs_docker_registry_mount_point_group_id: "0"
+glusterfs_docker_registry_volume_name:          "dr"
