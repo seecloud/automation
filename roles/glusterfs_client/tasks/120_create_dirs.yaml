@@ -1,0 +1,7 @@
+- name: Create mount point
+  file:
+    path: "{{ gluster_mount_point }}"
+    state: directory
+    mode: 0755
+    owner: "{{ gluster_mount_point_user_id }}"
+    group: "{{ gluster_mount_point_group_id }}"

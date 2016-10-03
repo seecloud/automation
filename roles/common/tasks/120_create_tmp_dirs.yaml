@@ -1,0 +1,4 @@
+- name: Creates temporary working directory
+  file: path={{ temp_working_dir }} state=directory
+  delegate_to: localhost
+  connection: local

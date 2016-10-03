@@ -1,2 +1,6 @@
 ---
-gluster_storage_dir: "/gluster_storage"
+glusterfs_elastic_search_storage_dir:  "/gluster_storage/elastic_search"
+glusterfs_docker_registry_storage_dir: "/gluster_storage/docker_registry"
+
+glusterfs_elastic_search_volume_name:  "es"
+glusterfs_docker_registry_volume_name: "dr"

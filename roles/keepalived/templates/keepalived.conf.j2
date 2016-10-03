@@ -23,7 +23,7 @@ vrrp_instance docker_registry {
         auth_pass {{ keepalived_auth_pass }}
     }
     virtual_ipaddress {
-        {{ docker_registry_ip }} dev {{ keepalived_iface }} label {{ keepalived_iface }}:0
+        {{ virtual_ip }} dev {{ keepalived_iface }} label {{ keepalived_iface }}:0
     }
         track_script {
             {{ keepalived_vrrp_check }}

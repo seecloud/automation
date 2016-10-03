@@ -1,0 +1,3 @@
+# ?
+#- name: Cleanup authorized_keys
+#  shell: sed -i '2,$d' '/root/.ssh/authorized_keys'

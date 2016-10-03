@@ -12,3 +12,5 @@ keepalived_notify_script: "/opt/docker_private_registry/roles/docker_registry/fi
 
 # registry role path - only for keepalived nodes
 registry_dest: "/opt"
+
+virtual_ip: "127.0.0.1"

@@ -3,16 +3,35 @@
 
 - debug: var=cluster_hosts
 
-- name: create gluster volume
+- name: create gluster volume elastic search
   gluster_volume:
-    state=present
-    name=elastic_backups
-    bricks="{{ gluster_storage_dir }}"
-    cluster="{{ cluster_hosts }}"
-    force=yes
-    rebalance=no
-    transport=tcp
-    replicas={{ num_hosts  }}
-    options='{ storage.owner-uid 105, storage.owner-gid 108 }'
+    state: present
+    name: "{{ glusterfs_elastic_search_volume_name }}"
+    bricks: "{{ glusterfs_elastic_search_storage_dir }}"
+    cluster: "{{ cluster_hosts }}"
+    force: yes
+    rebalance: no
+    transport: tcp
+    replicas: "{{ num_hosts  }}"
+    options:
+      storage.owner-uid: "105"
+      storage.owner-gid: "108"
   run_once: true
+
+
+- name: create gluster volume docker registry
+  gluster_volume:
+    state: present
+    name: "{{ glusterfs_docker_registry_volume_name }}"
+    bricks: "{{ glusterfs_docker_registry_storage_dir }}"
+    cluster: "{{ cluster_hosts }}"
+    force: yes
+    rebalance: no
+    transport: tcp
+    replicas: "{{ num_hosts  }}"
+    options:
+      storage.owner-uid: "0"
+      storage.owner-gid: "0"
+  run_once: true
+
 

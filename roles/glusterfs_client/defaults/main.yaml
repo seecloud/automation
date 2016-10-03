@@ -1,0 +1,3 @@
+---
+gluster_mount_point: "/mnt"
+glusterfs_volume_name: "glusterfs_volume"

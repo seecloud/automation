@@ -1,0 +1,7 @@
+- name: Copy private key into default user folder
+  copy:
+    src: '{{ temp_working_dir  }}/{{ ssh_keypair_name }}'
+    dest: '{{ user_home }}/.ssh/{{ ssh_keypair_name }}'
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0400

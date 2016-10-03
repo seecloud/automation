@@ -1,0 +1,20 @@
+- name: Mount glusterfs volume for Elastic Search
+  mount:
+    name: "{{ gluster_mount_point }}"
+    src: 127.0.0.1:{{ glusterfs_elastic_search_volume_name }}
+    fstype: glusterfs
+    opts: rw
+    state: mounted
+
+
+
+
+- name: Mount glusterfs volume for Docker Registry
+  mount:
+    name: "{{ gluster_mount_point }}"
+    src: 127.0.0.1:{{ glusterfs_docker_volume_name }}
+    fstype: glusterfs
+    opts: rw
+    state: mounted
+
+

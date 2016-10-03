@@ -60,7 +60,7 @@ Example
 
 
 ```
-4. Edit notify_runner.yml (this one is called during failover) with proper settings for docker registry server/clients  
+4. Edit notify_runner.yml (this one is called during failover) with proper settings for docker registry server/clients
 Example
 ```
 ---

@@ -1,41 +1,21 @@
 ---
 # tasks file for common
+  - include: 000_debug.yaml
 
-  - name: "Build hosts file"
-    lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
-    when: hostvars[item].ansible_default_ipv4.address is defined
-    with_items: groups['all']
+  - include: 100_build_hosts_file.yaml
 
-  - name: Update resolv.conf # neede only for temporary keepalived
-    lineinfile: dest=/etc/resolv.conf line='nameserver 8.8.8.8'
+  - include: 110_update_resolv_conf.yaml
 
-  - name: Creates temporary working directory
-    file: path={{ temp_working_dir }} state=directory
-    delegate_to: localhost
-    connection: local
+  - include: 120_create_tmp_dirs.yaml
 
-  - name: Generate SSH keys
-    shell: 'ssh-keygen -b 2048 -t rsa -f {{ temp_working_dir  }}/{{ ssh_keypair_name }} -q -N ""'
-    args:
-      creates: '{{ temp_working_dir  }}/{{ ssh_keypair_name }}'
-    delegate_to: localhost
-    connection: local
-    run_once: true
+  - include: 130_generate_ssh_keys.yaml
 
-  - name: Ensure user ssh dir exists
-    file: path='{{ user_home }}/.ssh' state=directory
+  - include: 140_check_dot_ssh_dirs.yaml
 
-  - name: Copy private key into default user folder
-    copy: src='{{ temp_working_dir  }}/{{ ssh_keypair_name }}' dest='{{ user_home }}/.ssh/{{ ssh_keypair_name }}' owner={{ default_user }} group={{ default_user }} mode=0400
+  - include: 150_copy_private_keys.yaml
 
-  - name: Cleanup authorized_keys
-    shell: sed -i '2,$d' '/root/.ssh/authorized_keys'
+  - include: 155_cleanup_keys.yaml
 
-  - name: Put public key into authorized_keys for root
-    authorized_key: user=root key="{{ lookup('file', '{{ temp_working_dir  }}/{{ ssh_keypair_name }}.pub') }}"
+  - include: 160_put_public_keys_for_root.yaml
 
-  - name: Update hosts with registry address
-    lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'
-
-  - name: Ensure certs directory for registry exists
-    file: path=/etc/docker/certs.d/{{ docker_registry_name }}:5000 state=directory recurse=yes
+  - include: 170_create_cert_dir.yaml

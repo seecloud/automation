@@ -8,14 +8,14 @@
 
   - name: Update ssl configuration
     blockinfile:
-      dest: /etc/ssl/openssl.cnf 
+      dest: /etc/ssl/openssl.cnf
       block: |
         [ alternate_names ]
         DNS.1        = registry
 
   - name: Update openssl settings - allow AltNames
     lineinfile: >
-      dest=/etc/ssl/openssl.cnf 
+      dest=/etc/ssl/openssl.cnf
       insertafter="^\[ v3_ca \]"
       line="subjectAltName = @alternate_names"
 
@@ -45,15 +45,35 @@
     ignore_errors: yes
     notify: restart docker
 
+
+  - set_fact:
+      docker_registry_tar_dir: "{{ docker_registry_tar|dirname }}"
+
+  - debug: var=docker_registry_tar_dir
+
+  - name: Docker custom tars dir
+    file:
+      path="{{ docker_registry_tar|dirname }}"
+      state=directory
+      mode=0755
+      recurse=true
+
+  - name: upload docker registry image file
+    copy:
+       src=files/custom/registry.tar
+       dest="{{ docker_registry_tar }}"
+
+
+
   - name: Load docker registry image from tar
     shell: 'docker load < {{ docker_registry_tar }}'
 
   - name: Run docker registry
     shell: >
-      docker run -d -p 5000:5000 
-      --restart=always 
-      --name registry   
-      -v /{{ registry_certs_path }}:/certs   
-      -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt   
+      docker run -d -p 5000:5000
+      --restart=always
+      --name registry
+      -v /{{ registry_certs_path }}:/certs
+      -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt
       -e REGISTRY_HTTP_TLS_KEY=/certs/{{ key_name }}.key registry
 
