@@ -1,15 +1,8 @@
 - name: Create GlusterFS Storage Dir
   file:
-    path="{{ glusterfs_elastic_search_storage_dir }}"
+    path="{{ glusterfs_storage_dir }}"
     state=directory
     mode=0755
 #    recurse=true
 
-
-- name: Create GlusterFS Storage Dir
-  file:
-    path="{{ glusterfs_docker_registry_storage_dir }}"
-    state=directory
-    mode=0755
-#    recurse=true
 

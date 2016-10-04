@@ -1,95 +1,15 @@
 ---
-# tasks file for docker_registry
-  - name: Ensure certs directory on host exist
-    file: path={{ registry_certs_path }} state=directory
 
-  - name: Ensure docker certs directory on clients exist
-    file: path=/etc/docker/certs.d/{{ container_address }} state=directory
+  - include: 110_registry_server_certs_dir.yaml
 
-  - name: Update ssl configuration
-    blockinfile:
-      dest: /etc/ssl/openssl.cnf
-      block: |
-        [ alternate_names ]
-        DNS.1        = registry
+  - include: 120_registry_server_generate_certs.yaml
 
-  - name: Update openssl settings - allow AltNames
-    lineinfile: >
-      dest=/etc/ssl/openssl.cnf
-      insertafter="^\[ v3_ca \]"
-      line="subjectAltName = @alternate_names"
+  - include: 130_registry_server_docker_service.yaml
+
+  - include: 140_registry_server_upload_registry_image.yaml
+
+  - include: 150_registry_server_start_registry.yaml
 
 
-  - name: Generate certs for registry TLS support
-    shell: >
-      openssl req -newkey rsa:{{ key_length }} -nodes -sha256
-      -keyout {{ registry_certs_path }}/{{ key_name }}.key -x509 -days {{ valid_time }}
-      -out {{ registry_certs_path }}/{{ key_name }}.crt
-      -subj '/CN={{ container_address }}/O={{ company_name }}/C={{  company_country }}'
-
-  - name: "Deploy certificate for server"
-    shell: 'cp {{ registry_certs_path }}/{{ key_name }}.crt /etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
-
-  - name: Ensure docker runner
-    service: name=docker state=started
-
-  - name: Ensure registry container removed before running new
-    docker_container:
-      name: registry
-      state: absent
-
-  - name: Ensure registry image removed before running new
-    docker_image:
-      name: registry
-      state: absent
-    ignore_errors: yes
-    notify: restart docker
-
-
-  - set_fact:
-      docker_registry_tar_dir: "{{ docker_registry_tar|dirname }}"
-
-  - debug: var=docker_registry_tar_dir
-
-  - name: Docker custom tars dir
-    file:
-      path="{{ docker_registry_tar|dirname }}"
-      state=directory
-      mode=0755
-      recurse=true
-
-  - name: upload docker registry image file
-    copy:
-       src=files/custom/registry.tar
-       dest="{{ docker_registry_tar }}"
-
-
-
-  - name: Load docker registry image from tar
-    shell: 'docker load < {{ docker_registry_tar }}'
-
-  - name: Run docker registry
-    shell: >
-      docker run -d -p 5000:5000
-      --restart=always
-      --name registry
-      -v /{{ registry_certs_path }}:/certs
-      -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt
-      -e REGISTRY_HTTP_TLS_KEY=/certs/{{ key_name }}.key registry
-
-
-#### gaff example
-#registry:
-#  image: registry
-#  restart: always
-#  hostname: go.gaff.io
-#  domainname: https://github.com/gocd/gocd-docker.git
-#  ports:
-#    - 127.0.0.1:5000:5000
-#  volumes:
-#    - /VOLUMES/registry/workdir/:/var/lib/registry
-#  environment:
-#    - REGISTRY_STORAGE_DELETE_ENABLED=True
-#
 
 

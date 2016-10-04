@@ -1,24 +1,36 @@
 ---
 # Load available images in folder files/custom
 
-  - name: Get list of images
-    shell: "ls {{ docker_custom_tars_path }} | cut -d '.' -f 1"
-    register: docker_images
-    always_run: true
+- name: Get list of images
+  shell: "ls -1 {{ role_path }}/files/custom/*.tar"
+  register: docker_images
+  delegate_to: localhost
+  connection: local
 
-  - name: Debug
-    debug: var=docker_images
+- name: Debug
+  debug: var=docker_images
 
-  - name: Load image from archive
-    docker_image:
-      name: '{{ item }}'
-      load_path: '{{ docker_custom_tars_path }}/{{ item }}.tar'
-    with_items: '{{ docker_images.stdout_lines }}'
 
-  - name: Tag image for private registry
-    shell: 'docker tag {{ item }} {{ container_address }}/{{ item }}:latest'
-    with_items: '{{ docker_images.stdout_lines }}'
+- name: Ensure docker images dir exists
+  file: path=/opt/docker_images state=directory
 
-  - name: Push images to private registry # for using push from docker_image - ansible 2.2 required
-    shell: 'docker push {{ container_address }}/{{ item }}:latest'
-    with_items: '{{ docker_images.stdout_lines }}'
+- name: Upload Images
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/docker_images/{{ item|basename }}"
+  with_items: '{{ docker_images.stdout_lines }}'
+
+
+- name: Load image from archive
+  docker_image:
+    name: "{{ (item | basename) | regex_replace('\\.tar$', '')  }}"
+    load_path: '/opt/docker_images/{{ item|basename }}'
+  with_items: '{{ docker_images.stdout_lines }}'
+
+- name: Tag image for private registry
+  shell: "docker tag {{ (item | basename) | regex_replace('\\.tar$', '') }}  {{ container_address }}/{{ ((item | basename) | regex_replace('\\.tar$', '')) }}:latest "
+  with_items: "{{ docker_images.stdout_lines }}"
+
+- name: Push images to private registry # for using push from docker_image - ansible 2.2 required
+  shell: "docker push {{ container_address }}/{{ (item | basename) | regex_replace('\\.tar$', '') }}:latest"
+  with_items: '{{ docker_images.stdout_lines }}'
