@@ -1,0 +1,22 @@
+- set_fact:
+    docker_certs_dir="/etc/docker/certs.d/{{ container_address }}"
+
+- debug: var=docker_certs_dir
+
+- name: Docker Registry Container
+  docker:
+    name: registry
+    image: registry
+    state: reloaded
+    pull: missing
+    net: bridge
+    restart_policy: always
+    ports:
+    - 5000:5000
+    volumes:
+    - "{{ docker_registry_mount_point }}:/var/lib/registry"
+    - "{{ registry_certs_path }}:/certs"
+    env:
+      REGISTRY_STORAGE_DELETE_ENABLED=True
+      REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ key_name }}.crt
+      REGISTRY_HTTP_TLS_KEY=/certs/{{ key_name }}.key

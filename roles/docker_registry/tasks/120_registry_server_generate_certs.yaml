@@ -1,0 +1,72 @@
+
+- name: Update ssl configuration
+  blockinfile:
+    dest: /etc/ssl/openssl.cnf
+    block: |
+      [ alternate_names ]
+      DNS.1        = registry
+  delegate_to: localhost
+  connection: local
+
+- name: Update openssl settings - allow AltNames
+  lineinfile: >
+    dest=/etc/ssl/openssl.cnf
+    insertafter="^\[ v3_ca \]"
+    line="subjectAltName = @alternate_names"
+  delegate_to: localhost
+  connection: local
+
+
+- debug: var=playbook_dir
+- debug: var=role_path
+
+- name: Generate certs for registry TLS support
+  shell: >
+    openssl req -newkey rsa:{{ key_length }} -nodes -sha256
+    -keyout {{ role_path }}/files/{{ key_name }}.key -x509 -days {{ valid_time }}
+    -out {{ role_path }}/files/{{ key_name }}.crt
+    -subj '/CN={{ container_address }}/O={{ company_name }}/C={{ company_country }}'
+  args:
+    creates: "{{ role_path }}/files/{{ key_name }}.crt"
+  delegate_to: localhost
+  connection: local
+
+#- name: "Deploy certificate for server"
+#  shell: 'cp {{ registry_certs_path }}/{{ key_name }}.crt /etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
+
+- name: Copy Cert to Docker Registry Server
+  copy:
+    src: "files/{{ key_name }}.crt"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt"
+
+
+- name: Copy Cert Key to Docker Registry Server
+  copy:
+    src: "files/{{ key_name }}.key"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.key"
+
+
+
+- name: Copy Cert to Docker Registry Server to /etc
+  copy:
+    src: "files/{{ key_name }}.crt"
+    dest: "{{ registry_certs_path }}/{{ key_name }}.crt"
+
+
+- name: Copy Cert Key to Docker Registry Server to /etc
+  copy:
+    src: "files/{{ key_name }}.key"
+    dest: "{{ registry_certs_path }}/{{ key_name }}.key"
+
+- name: Create symlink /etc
+  file:
+    src: "{{ registry_certs_path }}/{{ key_name }}.crt"
+    dest: "{{ registry_certs_path }}/{{ key_name }}.cert"
+    state: link
+
+- name: Create symlink
+  file:
+    src: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.cert"
+    state: link
+
