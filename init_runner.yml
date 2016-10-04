@@ -20,6 +20,9 @@
         docker_registry_user_id: '0'
         docker_registry_group_id: '0'
 
+# Docker Registry name
+        registry_name: 'registry'
+
 # ElasticSearch params.
         elastic_search_backup_dir:   '/volumes/es_backup_dir'
         elastic_search_data_dir:     '/volumes/es_data_dir'
@@ -31,63 +34,83 @@
         docker_registry_virtual_ip:  '192.168.59.100'
         docker_registry_mount_point: '/opt/docker_registry_mount_point'
 
-  roles:
-      - role: common
-        docker_registry_ip: "{{ docker_registry_virtual_ip }}"
+
+#
+#
+#  roles:
+#      - role: common
+#        docker_registry_ip: "{{ docker_registry_virtual_ip }}"
+#        docker_registry_name: "{{ registry_name }}"
+#
+#- hosts: pr1
+#  roles:
+#     - role: keepalived
+#       keepalived_state: "master"
+#       virtual_ip: "{{ docker_registry_virtual_ip }}"
+#
+#- hosts: pr2
+#  roles:
+#     - role: keepalived
+#       keepalived_state: "backup"
+#       virtual_ip: "{{ docker_registry_virtual_ip }}"
+#
+#- hosts: pr3
+#  roles:
+#     - role: keepalived
+#       keepalived_state: "backup"
+#       virtual_ip: "{{ docker_registry_virtual_ip }}"
+#
+#
+#- hosts: glusterfs_nodes
+#  roles:
+#    - role: glusterfs_server
+#      glusterfs_docker_registry_volume_name: "{{ docker_registry_volume_name }}"
+#      glusterfs_elastic_search_volume_name:  "{{ elastic_search_volume_name }}"
+#      glusterfs_elastic_search_storage_dir:  "{{ elastic_search_storage_dir }}"
+#      glusterfs_docker_registry_storage_dir: "{{ docker_registry_storage_dir }}"
+#
+#
+
+#- hosts: all
+#  roles:
+#    - role: glusterfs_client
+#      glusterfs_docker_registry_mount_point: "{{ docker_registry_mount_point }}"
+#      glusterfs_docker_registry_volume_name: "{{ docker_registry_volume_name }}"
+#
+#      glusterfs_elastic_search_mount_point: "{{ elastic_search_backup_dir }}"
+#      glusterfs_elastic_search_volume_name: "{{ elastic_search_volume_name }}"
+#
+#      glusterfs_elastic_search_mount_point_user_id:  "{{ elastic_search_user_id }}"
+#      glusterfs_elastic_search_mount_point_group_id: "{{ elastic_search_group_id }}"
+#
+#      glusterfs_docker_registry_mount_point_user_id:  "{{ docker_registry_user_id }}"
+#      glusterfs_docker_registry_mount_point_group_id: "{{ docker_registry_group_id }}"
+#
+
+
+
+
 
 - hosts: pr1
   roles:
-     - role: keepalived
-       keepalived_state: "master"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
+    - role: docker_registry
+      registry_role: "server"
+      docker_registry_name: "{{ registry_name }}"
 
-- hosts: pr2
-  roles:
-     - role: keepalived
-       keepalived_state: "backup"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
-
-- hosts: pr3
-  roles:
-     - role: keepalived
-       keepalived_state: "backup"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
-
-
-- hosts: glusterfs_nodes
-  roles:
-    - role: glusterfs_server
-      glusterfs_docker_registry_volume_name: "{{ docker_registry_volume_name }}"
-      glusterfs_elastic_search_volume_name:  "{{ elastic_search_volume_name }}"
-      glusterfs_elastic_search_storage_dir:  "{{ elastic_search_storage_dir }}"
-      glusterfs_docker_registry_storage_dir: "{{ docker_registry_storage_dir }}"
-
-
-- hosts: all
-  roles:
-    - role: glusterfs_client
-      glusterfs_docker_registry_mount_point: "{{ docker_registry_mount_point }}"
-      glusterfs_docker_registry_volume_name: "{{ docker_registry_volume_name }}"
-
-      glusterfs_elastic_search_mount_point: "{{ elastic_search_backup_dir }}"
-      glusterfs_elastic_search_volume_name: "{{ elastic_search_volume_name }}"
-
-      glusterfs_elastic_search_mount_point_user_id:  "{{ elastic_search_user_id }}"
-      glusterfs_elastic_search_mount_point_group_id: "{{ elastic_search_group_id }}"
-
-      glusterfs_docker_registry_mount_point_user_id:  "{{ docker_registry_user_id }}"
-      glusterfs_docker_registry_mount_point_group_id: "{{ docker_registry_group_id }}"
-
-
-
-
-
-
-#- hosts: pr1
+#- hosts: pr2
 #  roles:
-#      -  role: docker_registry
-#         registry_role: "server"
-#
+#    - role: docker_registry
+#      registry_role: "server"
+#      docker_registry_name: "{{ registry_name }}"
+
+#- hosts: pr3
+#  roles:
+#    - role: docker_registry
+#      registry_role: "server"
+#      docker_registry_name: "{{ registry_name }}"
+
+
+
 #- hosts: all
 #  roles:
 #      - role: docker_registry

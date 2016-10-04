@@ -1,0 +1,4 @@
+- name: Ensure docker runner
+  service:
+    name: docker
+    state: started
