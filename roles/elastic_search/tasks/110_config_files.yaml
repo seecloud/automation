@@ -1,3 +1,11 @@
+- debug: var=groups['elasticsearch_nodes']
+
+
+#- debug: var=hostvars['pr1']
+#- debug: var=hostvars['pr2']['ansible_default_ipv4']
+#- debug: var=hostvars['pr3']['ansible_default_ipv4']['address']
+
+
 - set_fact:
     nodes_ip_addr_list: "{% set IP_ARR=[] %}{% for host in groups['elasticsearch_nodes'] %}{% if IP_ARR.insert(loop.index,hostvars[host]['ansible_default_ipv4']['address']) %}{% endif %}{% endfor %}{{IP_ARR}}"
 

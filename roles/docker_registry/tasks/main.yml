@@ -8,10 +8,10 @@
   include: registry.yml
   when: registry_role == "server"
 
-#- name: "Load custom images"
-#  include: images.yml
-#  when: registry_role == "server"
-
+- name: "Load custom images"
+  include: images.yml
+  when: registry_role == "server"
+  run_once: true
 #
 - name: "Deploy docker registry certificates"
   include: client.yml
