@@ -58,3 +58,15 @@
     src: "files/{{ key_name }}.key"
     dest: "{{ registry_certs_path }}/{{ key_name }}.key"
 
+- name: Create symlink /etc
+  file:
+    src: "{{ registry_certs_path }}/{{ key_name }}.crt"
+    dest: "{{ registry_certs_path }}/{{ key_name }}.cert"
+    state: link
+
+- name: Create symlink
+  file:
+    src: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.cert"
+    state: link
+

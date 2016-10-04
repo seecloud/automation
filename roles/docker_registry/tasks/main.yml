@@ -13,8 +13,8 @@
 #  when: registry_role == "server"
 
 #
-#- name: "Deploy docker registry certificates"
-#  include: client.yml
-#  when: registry_role == "client"
-#  delegate_to: '{{ docker_registry_ip }}'
+- name: "Deploy docker registry certificates"
+  include: client.yml
+  when: registry_role == "client"
+  delegate_to: '{{ docker_registry_ip }}'
 
