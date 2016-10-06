@@ -11,6 +11,14 @@ pr1
 pr2
 pr3
 
+
+[keepalived_nodes]
+pr1
+pr2
+pr3
+
+
+
 [glusterfs_nodes]
 pr1
 pr2

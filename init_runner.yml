@@ -80,10 +80,12 @@
       glusterfs_mount_point_group_id: "{{ docker_registry_group_id }}"
 
 
+- hosts: keepalived_nodes
     - role: docker_registry
       registry_role: "server"
       docker_registry_name: "{{ registry_name }}"
 
+- hosts: all
     - role: docker_registry
       registry_role: "client"
       docker_registry_ip: "{{ docker_registry_virtual_ip }}"

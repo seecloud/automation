@@ -12,7 +12,7 @@
 
 - name: upload docker registry image file
   copy:
-    src: files/custom/registry.tar
+    src: " {{ role_path }}/files/registry.tar"
     dest: "{{ docker_registry_tar }}"
 
 
