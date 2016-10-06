@@ -12,10 +12,15 @@
 
 - name: upload docker registry image file
   copy:
-    src: files/custom/registry.tar
+    src:  "{{ role_path }}/files/registry.tar"
     dest: "{{ docker_registry_tar }}"
 
 
 
 - name: Load docker registry image from tar
   shell: 'docker load < {{ docker_registry_tar }}'
+
+
+
+- name: Tag  registry image as latest
+  shell: "docker tag registry:2 registry:latest"
