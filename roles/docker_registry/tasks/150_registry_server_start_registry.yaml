@@ -6,7 +6,7 @@
 - name: Docker Registry Container
   docker:
     name: registry
-    image: registry:2
+    image: registry:latest
     state: reloaded
     pull: missing
     net: bridge
