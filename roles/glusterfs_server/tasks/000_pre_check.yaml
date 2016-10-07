@@ -9,6 +9,8 @@
 
 - debug: var=play_hosts
 
+- debug: var=num_hosts
+
 #- set_fact:
 #    is_even: "{{ ( num_hosts | int ) is even }}"
 #
@@ -16,7 +18,7 @@
 
 
 - name: PreCheck_NodesNumber
-  fail: msg="The number of nodes must be exactly 3!"
-  when: num_hosts | int != 3
+  fail: msg="The number of nodes must > 2"
+  when: num_hosts | int < 2
 
 

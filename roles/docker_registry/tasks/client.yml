@@ -1,14 +1,31 @@
 ---
+- name: Ensure certs directory on host exist
+  file: path={{ registry_certs_path }} state=directory
+
+- name: Ensure docker certs directory on clients exist
+  file: path=/etc/docker/certs.d/{{ container_address }} state=directory
+
 - name: Copy Cert to Docker Registry Server to /etc
   copy:
     src: "files/{{ key_name }}.crt"
     dest: "{{ registry_certs_path }}/{{ key_name }}.crt"
 
-
 - name: Copy Cert Key to Docker Registry Server to /etc
   copy:
     src: "files/{{ key_name }}.key"
     dest: "{{ registry_certs_path }}/{{ key_name }}.key"
+
+- name: Copy Cert to Docker Registry Server
+  copy:
+    src: "files/{{ key_name }}.crt"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt"
+
+
+- name: Copy Cert Key to Docker Registry Server
+  copy:
+    src: "files/{{ key_name }}.key"
+    dest: "/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.key"
+
 
 - name: Create symlink /etc
   file:
