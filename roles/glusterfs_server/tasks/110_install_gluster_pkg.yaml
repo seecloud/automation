@@ -1,9 +1,42 @@
 - name: Update apt cache
   apt: update_cache=yes
   sudo: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 
 - name: Inastall Gluster
   apt: name={{ item }}
   with_items:
     -  glusterfs-server
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+
+
+- name: Inastall Gluster
+  package: name={{ item }}
+  with_items:
+    - glusterfs
+    - glusterfs-server
+    - python-gluster
+    - glusterfs-cli
+    - glusterfs-api
+    - glusterfs-fuse
+  when: ansible_distribution == 'CentOS'
+
+
+
+
+- name: Disable Firewall
+  service:
+    name: firewalld.service
+    state: stopped
+    enabled: no
+  when: ansible_distribution == 'CentOS'
+
+
+- name: GlusterFS service
+  service:
+    name: glusterd.service
+    state: started
+    enabled: yes
+  when: ansible_distribution == 'CentOS'

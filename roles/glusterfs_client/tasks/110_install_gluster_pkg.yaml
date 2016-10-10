@@ -1,9 +1,17 @@
 - name: Update apt cache
   apt: update_cache=yes
   sudo: yes
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 
 - name: Inastall Gluster
   apt: name={{ item }}
   with_items:
     -  glusterfs-client
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Inastall Gluster
+  package: name={{ item }}
+  with_items:
+    - glusterfs-fuse
+  when: ansible_distribution == 'CentoOS'
