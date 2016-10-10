@@ -1,6 +1,7 @@
 ---
 - name: Ensure certs directory on host exist
   file: path={{ registry_certs_path }} state=directory
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Ensure docker certs directory on clients exist
   file: path=/etc/docker/certs.d/{{ container_address }} state=directory
