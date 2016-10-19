@@ -1,3 +1,6 @@
+- stat: "path={{ glusterfs_mount_point }}"
+  register: mountpoint
+
 - name: Create mount point
   file:
     path: "{{ glusterfs_mount_point }}"
@@ -5,4 +8,5 @@
     mode: 0755
     owner: "{{ glusterfs_mount_point_user_id }}"
     group: "{{ glusterfs_mount_point_group_id }}"
+  when: mountpoint.stat.exists == False
 

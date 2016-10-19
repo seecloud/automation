@@ -4,11 +4,9 @@
 
   - include: 120_registry_server_generate_certs.yaml
 
-  - include: 130_registry_server_docker_service.yaml
+  - include: 130_registry_server_upload_registry_image.yaml
 
-  - include: 140_registry_server_upload_registry_image.yaml
-
-  - include: 150_registry_server_start_registry.yaml
+  - include: 140_registry_server_start_registry.yaml
 
 
 
