@@ -92,6 +92,11 @@
 #
 - hosts: elasticsearch_nodes
   roles:
+    - role: glusterfs_client
+      glusterfs_mount_point:          "{{ elastic_search_backup_dir }}"
+      glusterfs_volume_name:          "{{ elastic_search_volume_name }}"
+      glusterfs_mount_point_user_id:  "{{ elastic_search_user_id }}"
+      glusterfs_mount_point_group_id: "{{ elastic_search_group_id }}"
     - role: elastic_search
       es_data_dir:      "{{ elastic_search_data_dir }}"
       es_config_dir:    "{{ elastic_search_config_dir }}"
