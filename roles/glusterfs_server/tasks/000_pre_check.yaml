@@ -1,9 +1,3 @@
-#{% for host in play_hosts %}
-#{% if 'ansible_eth0' in hostvars[host] %}
-#{{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}  {{ host }}
-#{% endif %}
-#{% endfor %}
-
 - set_fact:
     num_hosts: "{{ play_hosts | length }}"
 
@@ -11,14 +5,10 @@
 
 - debug: var=num_hosts
 
-#- set_fact:
-#    is_even: "{{ ( num_hosts | int ) is even }}"
-#
-#- debug: var=is_even
-
+- debug: var=replica_factor
 
 - name: PreCheck_NodesNumber
-  fail: msg="The number of nodes must > 2"
-  when: num_hosts | int < 2
+  fail: msg="The number of nodes must be > replica_factor"
+  when: num_hosts | int < {{ replica_factor }}
 
 

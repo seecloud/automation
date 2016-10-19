@@ -8,8 +8,7 @@
   connection: local
 
 - name: Debug
-  debug: var=docker_images
-
+  debug: var=docker_images.stdout_lines
 
 - name: Ensure docker images dir exists
   file: path=/opt/docker_images state=directory
@@ -18,19 +17,18 @@
   copy:
     src: "{{ item }}"
     dest: "/opt/docker_images/{{ item|basename }}"
-  with_items: '{{ docker_images.stdout_lines }}'
-
+  with_items: '{{ docker_images.stdout_lines | default([]) }}'
 
 - name: Load image from archive
   docker_image:
     name: "{{ (item | basename) | regex_replace('\\.tar$', '')  }}"
     load_path: '/opt/docker_images/{{ item|basename }}'
-  with_items: '{{ docker_images.stdout_lines }}'
+  with_items: '{{ docker_images.stdout_lines | default([]) }}'
 
 - name: Tag image for private registry
   shell: "docker tag {{ (item | basename) | regex_replace('\\.tar$', '') }}  {{ container_address }}/{{ ((item | basename) | regex_replace('\\.tar$', '')) }}:latest "
-  with_items: "{{ docker_images.stdout_lines }}"
+  with_items: '{{ docker_images.stdout_lines | default([]) }}'
 
 - name: Push images to private registry # for using push from docker_image - ansible 2.2 required
   shell: "docker push {{ container_address }}/{{ (item | basename) | regex_replace('\\.tar$', '') }}:latest"
-  with_items: '{{ docker_images.stdout_lines }}'
+  with_items: '{{ docker_images.stdout_lines | default([]) }}'

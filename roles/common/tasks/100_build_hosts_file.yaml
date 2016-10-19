@@ -1,8 +1,5 @@
-- name: "Build hosts file"
-  lineinfile: dest=/etc/hosts regexp='.*{{ item }}$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{item}}" state=present
-  when: hostvars[item].ansible_default_ipv4.address is defined
-  with_items: groups['all']
-
+- name: "Generate /etc/hosts file"
+  template: "src=hosts.j2 dest='/etc/hosts' owner=root group=root mode=0644"
 
 - name: Update hosts with registry address
   lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'

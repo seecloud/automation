@@ -4,13 +4,13 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 
-- name: Inastall Gluster
+- name: Install Gluster
   apt: name={{ item }}
   with_items:
     -  glusterfs-client
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-- name: Inastall Gluster
+- name: Install Gluster
   package: name={{ item }}
   with_items:
     - glusterfs-fuse

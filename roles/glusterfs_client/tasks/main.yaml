@@ -1,4 +1,5 @@
 ---
+ # replace in future mount module with gluster_volume module from ansible extra modules
  - include: 110_install_gluster_pkg.yaml
 
  - include: 120_create_dirs.yaml

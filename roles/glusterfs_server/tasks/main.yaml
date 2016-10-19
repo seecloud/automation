@@ -1,6 +1,6 @@
 ---
 # - include: 000_hosts.yaml
-
+ # replace in future with gluster_volume from extra volume
  - include: 000_pre_check.yaml
 
  - include: 110_install_gluster_pkg.yaml
