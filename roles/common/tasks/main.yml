@@ -19,3 +19,5 @@
   - include: 160_put_public_keys_for_root.yaml
 
   - include: 170_create_cert_dir.yaml
+
+  - include: 180_setup_docker_service.yaml

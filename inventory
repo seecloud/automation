@@ -2,6 +2,8 @@
 pr1
 pr2
 pr3
+pr4
+pr5
 
 [all:vars]
 ansible_user="root"
@@ -10,6 +12,8 @@ ansible_user="root"
 pr1
 pr2
 pr3
+pr4
+pr5
 
 
 [keepalived_nodes]
@@ -23,6 +27,3 @@ pr3
 pr1
 pr2
 pr3
-#pr4
-#pr5
-

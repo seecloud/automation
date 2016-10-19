@@ -1,10 +1,31 @@
-- name: Mount glusterfs volume
+- name: Choose random glusterfs server for mounting volume
+  set_fact:
+    gluster_server: "{{ groups['glusterfs_nodes'] | random }}"
+
+# workoaround while waitung for https://github.com/ansible/ansible-modules-core/issues/1697
+- name: Unmount glusterfs volume 
+  mount:
+    name: "{{ glusterfs_mount_point }}"
+    state: unmounted
+
+- name: Mount glusterfs volume locally
   mount:
     name: "{{ glusterfs_mount_point }}"
     src: "127.0.0.1:{{ glusterfs_volume_name }}"
     fstype: glusterfs
     opts: rw
     state: mounted
+  when: "'{{ inventory_hostname }}' in groups['glusterfs_nodes']"
+
+
+- name: Mount glusterfs volume remote
+  mount:
+    name: "{{ glusterfs_mount_point }}"
+    src: "{{ gluster_server }}:{{ glusterfs_volume_name }}"
+    fstype: glusterfs
+    opts: rw
+    state: mounted
+  when: "'{{ inventory_hostname }}' not in groups['glusterfs_nodes']"
 
 
 

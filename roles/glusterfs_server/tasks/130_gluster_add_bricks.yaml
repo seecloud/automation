@@ -10,11 +10,14 @@
     bricks: "{{ glusterfs_storage_dir }}"
     cluster: "{{ cluster_hosts }}"
     force: yes
-    rebalance: no
+    rebalance: yes
     transport: tcp
-    replicas: "{{ num_hosts  }}"
+    replicas: "{{ replica_factor  }}"
     options:
       storage.owner-uid: "105"
       storage.owner-gid: "108"
-  run_once: true
-
+  run_once: True
+  register: result
+  until: result|succeeded
+  retries: 5
+  delay: 10

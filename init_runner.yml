@@ -31,7 +31,7 @@
         elastic_search_docker_image: 'registry:5000/elasticsearch'
 # Keepalived
 # Virtual IP
-        docker_registry_virtual_ip:  '192.168.59.100'
+        docker_registry_virtual_ip:  '192.168.122.250'
         docker_registry_mount_point: '/opt/docker_registry_mount_point'
 
 
@@ -71,20 +71,17 @@
       glusterfs_storage_dir:  "{{ elastic_search_storage_dir }}"
 
 
-- hosts: all
+- hosts: keepalived_nodes
   roles:
     - role: glusterfs_client
       glusterfs_mount_point:          "{{ docker_registry_mount_point }}"
       glusterfs_volume_name:          "{{ docker_registry_volume_name }}"
       glusterfs_mount_point_user_id:  "{{ docker_registry_user_id }}"
       glusterfs_mount_point_group_id: "{{ docker_registry_group_id }}"
-
-
-- hosts: keepalived_nodes
-  roles:
     - role: docker_registry
       registry_role: "server"
       docker_registry_name: "{{ registry_name }}"
+
 
 - hosts: all
   roles:

@@ -3,10 +3,16 @@
 
 - debug: var=docker_certs_dir
 
+- name: Ensure docker runner
+  service:
+    name: docker-latest.service
+    state: restarted
+  when: ansible_distribution == 'CentOS'
+
 - name: Docker Registry Container
   docker:
     name: registry
-    image: registry:latest
+    image: registry:2
     state: reloaded
     pull: missing
     net: bridge

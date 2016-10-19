@@ -1,9 +1,0 @@
----
-- hosts: localhost
-  connection: local
-  roles:
-      - { role: docker_registry, registry_role: "server"}
-
-- hosts: all
-  roles:
-      - { role: docker_registry, registry_role: "client"}

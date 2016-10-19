@@ -14,7 +14,7 @@
 
 - name: Create ElasticSerach Config File
   template:
-    src=templates/elasticsearch.yml
+    src=elasticsearch.yml
     dest="{{ es_config_dir }}/elasticsearch.yml"
     owner="{{ elastic_search_user_id }}"
     group="{{ elastic_search_group_id }}"
@@ -25,7 +25,7 @@
 
 - name: Create ElasticSerach Config Log File
   template:
-    src=templates/logging.yml
+    src=logging.yml
     dest="{{ es_config_dir }}/logging.yml"
     owner="{{ elastic_search_user_id }}"
     group="{{ elastic_search_group_id }}"
