@@ -12,7 +12,7 @@
     force: yes
     rebalance: yes
     transport: tcp
-    replicas: "{{ num_hosts  }}"
+    replicas: "{{ replica_factor  }}"
     options:
       storage.owner-uid: "105"
       storage.owner-gid: "108"
