@@ -1,0 +1,14 @@
+- set_fact:
+    num_hosts: "{{ play_hosts | length }}"
+
+- debug: var=play_hosts
+
+- debug: var=num_hosts
+
+- debug: var=replica_factor
+
+- name: PreCheck_NodesNumber
+  fail: msg="The number of nodes must be > replica_factor"
+  when: num_hosts | int < {{ replica_factor }}
+
+

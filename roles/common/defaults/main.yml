@@ -1,0 +1,10 @@
+---
+# defaults file for common
+temp_working_dir: "/tmp/msa"
+default_user: "root"
+user_home: "/root"
+ssh_keypair_name: "id_rsa"
+
+#docker_registry_name: "registry"
+#docker_registry_ip: "192.168.122.250"
+#docker_registry_ip: "192.168.59.100"

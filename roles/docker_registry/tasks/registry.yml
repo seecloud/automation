@@ -1,0 +1,13 @@
+---
+
+  - include: 110_registry_server_certs_dir.yaml
+
+  - include: 120_registry_server_generate_certs.yaml
+
+  - include: 130_registry_server_upload_registry_image.yaml
+
+  - include: 140_registry_server_start_registry.yaml
+
+
+
+

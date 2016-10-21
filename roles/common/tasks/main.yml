@@ -1,0 +1,23 @@
+---
+# tasks file for common
+  - include: 000_debug.yaml
+
+  - include: 100_build_hosts_file.yaml
+
+  - include: 110_update_resolv_conf.yaml
+
+  - include: 120_create_tmp_dirs.yaml
+
+  - include: 130_generate_ssh_keys.yaml
+
+  - include: 140_check_dot_ssh_dirs.yaml
+
+  - include: 150_copy_private_keys.yaml
+
+  - include: 155_cleanup_keys.yaml
+
+  - include: 160_put_public_keys_for_root.yaml
+
+  - include: 170_create_cert_dir.yaml
+
+  - include: 180_setup_docker_service.yaml

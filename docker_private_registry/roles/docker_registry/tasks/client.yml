@@ -1,5 +1,0 @@
----
-# tasks file for docker_registry
-  - name: "Deploy certificate for clients"
-    synchronize: src='{{ registry_certs_path }}/{{ key_name }}.crt' dest='/etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
-    remote_user: root # 14.04 bug which requires remote_user override for delegations

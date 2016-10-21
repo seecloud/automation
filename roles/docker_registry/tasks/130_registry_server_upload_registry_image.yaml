@@ -1,0 +1,26 @@
+- set_fact:
+    docker_registry_tar_dir: "{{ docker_registry_tar|dirname }}"
+
+- debug: var=docker_registry_tar_dir
+
+- name: Docker custom tars dir
+  file:
+    path: "{{ docker_registry_tar|dirname }}"
+    state: directory
+    mode: 0755
+    recurse: true
+
+- name: upload docker registry image file
+  copy:
+    src:  "{{ role_path }}/files/registry.tar"
+    dest: "{{ docker_registry_tar }}"
+
+
+
+- name: Load docker registry image from tar
+  shell: 'docker load < {{ docker_registry_tar }}'
+
+
+
+- name: Tag  registry image as latest
+  shell: "docker tag registry:2 registry:latest"

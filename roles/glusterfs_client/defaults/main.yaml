@@ -1,0 +1,5 @@
+---
+glusterfs_mount_point:          "/mnt/dr"
+glusterfs_mount_point_user_id:  "0"
+glusterfs_mount_point_group_id: "0"
+glusterfs_volume_name:          "volume-name"

@@ -1,0 +1,11 @@
+- name: Mount glusterfs volume
+  mount:
+    name: "{{ glusterfs_mount_point }}"
+    src: "127.0.0.1:{{ glusterfs_volume_name }}"
+    fstype: glusterfs
+    opts: rw
+    state: mounted
+
+
+
+

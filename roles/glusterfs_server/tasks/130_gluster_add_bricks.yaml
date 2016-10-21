@@ -1,0 +1,23 @@
+- set_fact:
+    cluster_hosts: "{{ play_hosts | join(',') }}"
+
+- debug: var=cluster_hosts
+
+- name: create gluster volume
+  gluster_volume:
+    state: present
+    name: "{{ glusterfs_volume_name }}"
+    bricks: "{{ glusterfs_storage_dir }}"
+    cluster: "{{ cluster_hosts }}"
+    force: yes
+    rebalance: yes
+    transport: tcp
+    replicas: "{{ replica_factor  }}"
+    options:
+      storage.owner-uid: "105"
+      storage.owner-gid: "108"
+  run_once: True
+  register: result
+  until: result|succeeded
+  retries: 5
+  delay: 10

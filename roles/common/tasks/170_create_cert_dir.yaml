@@ -1,0 +1,19 @@
+- name: Ensure certs directory for registry exists
+  file: path=/etc/docker/certs.d/{{ docker_registry_name }}:5000 state=directory recurse=yes
+
+- name: Ensure docker runner
+  service:
+    name: docker
+    state: started
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: Disable SElinux (to be changed )
+  selinux:
+    state: disabled
+  when: ansible_distribution == 'CentOS'
+
+- name: Ensure docker runner
+  service:
+    name: docker-latest.service
+    state: started
+  when: ansible_distribution == 'CentOS'

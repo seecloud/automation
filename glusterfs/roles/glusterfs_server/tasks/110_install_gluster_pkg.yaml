@@ -1,9 +1,0 @@
-- name: Update apt cache
-  apt: update_cache=yes
-  sudo: yes
-
-
-- name: Inastall Gluster
-  apt: name={{ item }}
-  with_items:
-    -  glusterfs-server

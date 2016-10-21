@@ -1,0 +1,3 @@
+- name: Start keepalived
+  service: name=keepalived state=running
+  tags: keepalived

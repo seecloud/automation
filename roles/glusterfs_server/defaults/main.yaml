@@ -1,0 +1,4 @@
+---
+glusterfs_storage_dir: "/gluster_storage/stotage1"
+glusterfs_volume_name: "volume"
+replica_factor: 3

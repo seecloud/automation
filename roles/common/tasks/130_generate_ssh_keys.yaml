@@ -1,0 +1,7 @@
+- name: Generate SSH keys
+  shell: 'ssh-keygen -b 2048 -t rsa -f {{ temp_working_dir  }}/{{ ssh_keypair_name }} -q -N ""'
+  args:
+    creates: '{{ temp_working_dir  }}/{{ ssh_keypair_name }}'
+  delegate_to: localhost
+  connection: local
+  run_once: true
