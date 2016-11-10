@@ -1,0 +1,46 @@
+---
+  kind: "Pod"
+  apiVersion: "v1"
+  metadata:
+    name: "flannel"
+    namespace: "kube-system"
+    labels:
+      app: "flannel"
+      version: "v0.1"
+  spec:
+    volumes:
+      - name: "subnetenv"
+        hostPath:
+          path: "/run/flannel"
+      - name: "networkconfig"
+        hostPath:
+          path: "/etc/flannel-network.json"
+    containers:
+      - name: "flannel-server-helper"
+        image: "{{ flannel_server_helper_image_repo }}:{{ flannel_server_helper_image_tag }}"
+        args:
+          - "--network-config=/etc/flannel-network.json"
+          - "--etcd-prefix=/{{ cluster_name }}/network"
+          - "--etcd-server={{ etcd_endpoint }}"
+        volumeMounts:
+          - name: "networkconfig"
+            mountPath: "/etc/flannel-network.json"
+        imagePullPolicy: "Always"
+      - name: "flannel-container"
+        image: "{{ flannel_image_repo }}:{{ flannel_image_tag }}"
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "/opt/bin/flanneld -etcd-endpoints {{ etcd_access_endpoint }} -etcd-prefix /{{ cluster_name }}/network {% if flannel_interface is defined %}-iface {{ flannel_interface }}{% endif %} {% if flannel_public_ip is defined %}-public-ip {{ flannel_public_ip }}{% endif %}"
+        ports:
+          - hostPort: 10253
+            containerPort: 10253
+        resources:
+          limits:
+            cpu: "100m"
+        volumeMounts:
+          - name: "subnetenv"
+            mountPath: "/run/flannel"
+        securityContext:
+          privileged: true
+    hostNetwork: true

@@ -1,0 +1,19 @@
+# This is where all the cert scripts and certs will be located
+kube_cert_dir: "{{ kube_config_dir }}/ssl"
+
+dns_domain: "{{ cluster_name }}"
+
+# resolv.conf to base dns config
+kube_resolv_conf: "/etc/resolv.conf"
+
+kube_proxy_mode: iptables
+
+# If using the pure iptables proxy, SNAT everything
+kube_proxy_masquerade_all: true
+
+# kube_api_runtime_config:
+#   - extensions/v1beta1/daemonsets=true
+#   - extensions/v1beta1/deployments=true
+
+nginx_image_repo: nginx
+nginx_image_tag: 1.11.4-alpine
