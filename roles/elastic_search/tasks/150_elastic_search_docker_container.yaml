@@ -1,7 +1,10 @@
+- name: Elasticsearch container
+  debug: var=download
+
 - name: ElasticSearch Container
   docker:
     name: elasticsearch
-    image: "{{ es_docker_image }}"
+    image: "{{ download.repo }}:{{ download.tag }}"
 #    state: started
     state: reloaded
     pull: missing
