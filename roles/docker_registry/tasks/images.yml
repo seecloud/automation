@@ -11,7 +11,7 @@
   debug: var=docker_images.stdout_lines
 
 - name: Ensure docker images dir exists
-  file: path=/opt/docker_images state=directory
+  file: path=/opt/docker_images state=directory # gluster volume ???
 
 - name: Upload Images
   copy:
@@ -19,16 +19,27 @@
     dest: "/opt/docker_images/{{ item|basename }}"
   with_items: '{{ docker_images.stdout_lines | default([]) }}'
 
-- name: Load image from archive
-  docker_image:
-    name: "{{ (item | basename) | regex_replace('\\.tar$', '')  }}"
-    load_path: '/opt/docker_images/{{ item|basename }}'
+- name: Load docker images from tars
+  shell: docker load < "/opt/docker_images/{{ item|basename }}"
+  register: loaded_images
   with_items: '{{ docker_images.stdout_lines | default([]) }}'
+
+- name: Register loaded images names
+  set_fact: 
+    image_item: "{{ item.stdout| regex_replace('Loaded image\\: ', '') }}"
+  with_items: "{{loaded_images.results }}"
+  register: load_result
+
+- name: Make list with docker images names for taging with private registry
+  set_fact: loaded_images_names="{{ load_result.results | map(attribute='ansible_facts.image_item') | list }}"
+
+- name: Loaded images
+  debug: var=loaded_images_names
 
 - name: Tag image for private registry
-  shell: "docker tag {{ (item | basename) | regex_replace('\\.tar$', '') }}  {{ container_address }}/{{ ((item | basename) | regex_replace('\\.tar$', '')) }}:latest "
-  with_items: '{{ docker_images.stdout_lines | default([]) }}'
+  shell: docker tag "{{ item }}"  "{{ container_address }}/{{item}}"
+  with_items: '{{ loaded_images_names | default([]) }}'
 
 - name: Push images to private registry # for using push from docker_image - ansible 2.2 required
-  shell: "docker push {{ container_address }}/{{ (item | basename) | regex_replace('\\.tar$', '') }}:latest"
-  with_items: '{{ docker_images.stdout_lines | default([]) }}'
+  shell: "docker push {{ container_address }}/{{item}}"
+  with_items: '{{ loaded_images_names | default([]) }}'
