@@ -349,7 +349,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-i', '--inventory', dest='inventory_path', required=True,
+        '-i', '--inventory', dest='inventory_path',
         help=('Inventory file path. Defaults to '
               '<path parameter>/inventory.cfg')
     )
@@ -394,5 +394,5 @@ if __name__ == "__main__":
     # Parse arguments
     args = parser.parse_args()
     if args.inventory_path is None:
-        args.configfile = 'inventory.cfg'
+        args.inventory_path = 'inventory.cfg'
     prepare(vars(args))
