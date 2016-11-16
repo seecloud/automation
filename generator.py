@@ -92,6 +92,7 @@ class CfgInventory(object):
                              {'hostname': 'kube-master', 'hostvars': []}
                              ]},
                          }
+        hostnames = {}
 
         if self.platform == 'openstack':
             if self.options['floating_ip']:
@@ -185,8 +186,6 @@ class CfgInventory(object):
                 instance_ip = 'public_ip'
             for host in (nodes + masters + etcds +
                          elastics + glusters + keepaliveds):
-                if self.platform == 'aws':
-                    host['name'] = "%s-%s" % (cluster_name, id_generator(5))
                 new_inventory['all']['hosts'].append(
                     {'hostname': '%s' % host['name'], 'hostvars': [
                         {'name': 'ansible_ssh_host',
@@ -225,7 +224,8 @@ class CfgInventory(object):
                          'hostvars': []}
                     )
         elif self.platform == 'metal':
-            for host in nodes + masters + etcds:
+            for host in (nodes + masters + etcds +
+                         elastics + glusters + keepaliveds):
                 if '[' in host:
                     r = re.search('(^.*)\[(.*)\]', host)
                     inventory_hostname = r.group(1)
@@ -237,9 +237,16 @@ class CfgInventory(object):
                 else:
                     inventory_hostname = host
                     hostvars = []
-                new_inventory['all']['hosts'].append(
-                    {'hostname': inventory_hostname, 'hostvars': hostvars}
-                )
+
+                if inventory_hostname not in hostnames.keys():
+                    hostnames[inventory_hostname] = hostvars
+                elif hostvars != hostnames[inventory_hostname]:
+                    hostnames[inventory_hostname] = hostvars + hostnames[inventory_hostname]
+
+            for host, hostvars in hostnames.iteritems():
+                    new_inventory['all']['hosts'].append(
+                        {'hostname': host, 'hostvars': hostvars}
+                    )
             for host in nodes:
                 new_inventory['kube-node']['hosts'].append(
                     {'hostname': host.split('[')[0], 'hostvars': []}
