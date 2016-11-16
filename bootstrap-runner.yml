@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars:
+    kube_network_plugin: calico
+  roles:
+    #- role: test
+    - role: bootstrap

@@ -1,0 +1,5 @@
+---
+#- include: test.yml
+
+- include: 110_download.yml file={{ downloads[item] }}
+  with_items: "{{ download_items }}"
