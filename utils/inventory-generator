@@ -349,7 +349,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-i', '--inventory', dest='inventory_path',
+        '-i', '--inventory', dest='inventory_path', required=True,
         help=('Inventory file path. Defaults to '
               '<path parameter>/inventory.cfg')
     )
@@ -383,7 +383,7 @@ if __name__ == "__main__":
         help='Number of elastic search nodes'
     )
     parser.add_argument(
-        '--keepaliveds', dest='keepaliveds_list', metavar='N',
+        '--registries', dest='keepaliveds_list', metavar='N',
         nargs='+', default=[], help='Number of keepalived nodes'
     )
     parser.add_argument(
@@ -393,6 +393,4 @@ if __name__ == "__main__":
 
     # Parse arguments
     args = parser.parse_args()
-    if args.inventory_path is None:
-        args.inventory_path = 'inventory.cfg'
     prepare(vars(args))
