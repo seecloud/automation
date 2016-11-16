@@ -1,22 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# Copyright 2016: Mirantis Inc.
+# All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
 """
 inventory_generator
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 Ansible inventory generator for seecloud automation,
 based on Kargo inventory generator
 """
 
 import argparse
+import random
+import re
 import string
 import sys
-import re
-from ansible.utils.display import Display
-display = Display()
 
-__version__ = 0.1
- 
+import ansible.utils.display as display
+import requests
+
+display = display.Display()
+
 try:
     import configparser
 except ImportError:
@@ -26,22 +42,23 @@ except ImportError:
 def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+
 def get_cluster_name():
     try:
-        word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+        word_site = ("http://svnweb.freebsd.org/csrg/share/dict/"
+                     "words?view=co&content-type=text/plain")
         response = requests.get(word_site)
         words = response.content.splitlines()
         cluster_name = random.choice(words).decode("utf-8")
-    except:
+    except Exception:
         cluster_name = id_generator()
     if not re.match('^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', cluster_name):
         get_cluster_name()
     return(cluster_name.lower())
 
+
 class CfgInventory(object):
-    '''
-    Read classic ansible inventory file.
-    '''
+    '''Read classic ansible inventory file.'''
 
     def __init__(self, options, platform):
         self.options = options
@@ -51,9 +68,9 @@ class CfgInventory(object):
         self.inventory = {'all': {'hosts': []},
                           'kube-master': {'hosts': []},
                           'etcd': {'hosts': []},
-                          'elasticsearch_nodes': {'hosts': []}, 
-                          'glusterfs_nodes': {'hosts': []}, 
-                          'keepalived_nodes': {'hosts': []}, 
+                          'elasticsearch_nodes': {'hosts': []},
+                          'glusterfs_nodes': {'hosts': []},
+                          'keepalived_nodes': {'hosts': []},
                           'kube-node': {'hosts': []},
                           'k8s-cluster:children': {'hosts': [
                               {'hostname': 'kube-node', 'hostvars': []},
@@ -61,12 +78,13 @@ class CfgInventory(object):
                           ]},
                           }
 
-    def format_inventory(self, masters, nodes, etcds, elastics, glusters, keepaliveds):
+    def format_inventory(self, masters, nodes, etcds,
+                         elastics, glusters, keepaliveds):
         new_inventory = {'all': {'hosts': []},
                          'kube-master': {'hosts': []},
                          'etcd': {'hosts': []},
-                         'elasticsearch_nodes': {'hosts': []}, 
-                         'glusterfs_nodes': {'hosts': []}, 
+                         'elasticsearch_nodes': {'hosts': []},
+                         'glusterfs_nodes': {'hosts': []},
                          'keepalived_nodes': {'hosts': []},
                          'kube-node': {'hosts': []},
                          'k8s-cluster:children': {'hosts': [
@@ -83,7 +101,8 @@ class CfgInventory(object):
             # handle masters
             new_instances = []
             for master in masters:
-                new_instances.append({'public_ip': master['openstack'][ip_type],
+                new_instances.append({'public_ip': (master['openstack']
+                                                    [ip_type]),
                                       'name': master['item']})
             masters = new_instances
             # handle nodes
@@ -101,19 +120,22 @@ class CfgInventory(object):
             # handle elastics
             new_instances = []
             for elastic in elastics:
-                new_instances.append({'public_ip': elastic['openstack'][ip_type],
+                new_instances.append({'public_ip': (elastic['openstack']
+                                                    [ip_type]),
                                       'name': elastic['item']})
             elastics = new_instances
             # handle glusterfs
             new_instances = []
             for gluster in glusters:
-                new_instances.append({'public_ip': gluster['openstack'][ip_type],
+                new_instances.append({'public_ip': (gluster['openstack']
+                                                    [ip_type]),
                                       'name': gluster['item']})
             glusters = new_instances
             # handle keepaliveds
             new_instances = []
             for keepalived in keepaliveds:
-                new_instances.append({'public_ip': keepalived['openstack'][ip_type],
+                new_instances.append({'public_ip': (keepalived['openstack']
+                                                    [ip_type]),
                                       'name': keepalived['item']})
             keepaliveds = new_instances
 
@@ -128,12 +150,31 @@ class CfgInventory(object):
                 etcds = [nodes[0]]
             elif etcds and len(etcds) < 3:
                 etcds = [etcds[0]]
+            if not elastics and len(nodes) >= 3:
+                elastics = nodes[0:3]
+            elif not elastics and len(nodes) < 3:
+                elastics = [nodes[0]]
+            elif elastics and len(elastics) < 3:
+                elastics = [elastics[0]]
+            if not glusters and len(nodes) >= 3:
+                glusters = nodes[0:3]
+            elif not glusters and len(nodes) < 3:
+                glusters = [nodes[0]]
+            elif glusters and len(glusters) < 3:
+                glusters = [glusters[0]]
+            if not keepaliveds and len(nodes) >= 2:
+                keepaliveds = nodes[0:2]
+            elif not keepaliveds and len(nodes) < 2:
+                keepaliveds = [nodes[0]]
+            elif keepaliveds and len(keepaliveds) < 2:
+                keepaliveds = [keepaliveds[0]]
 
-        if self.platform in ['aws', 'gce', 'openstack']:
+        if self.platform is 'openstack':
             if self.options['add_node']:
                 current_inventory = self.read_inventory()
                 cluster_name = '-'.join(
-                    current_inventory['all']['hosts'][0]['hostname'].split('-')[:-1]
+                    (current_inventory['all']['hosts']
+                     [0]['hostname']).split('-')[:-1]
                 )
                 new_inventory = current_inventory
             else:
@@ -142,12 +183,14 @@ class CfgInventory(object):
                 instance_ip = 'private_ip'
             else:
                 instance_ip = 'public_ip'
-            for host in nodes + masters + etcds + elastics + glusters + keepaliveds:
+            for host in (nodes + masters + etcds +
+                         elastics + glusters + keepaliveds):
                 if self.platform == 'aws':
                     host['name'] = "%s-%s" % (cluster_name, id_generator(5))
                 new_inventory['all']['hosts'].append(
                     {'hostname': '%s' % host['name'], 'hostvars': [
-                        {'name': 'ansible_ssh_host', 'value': host[instance_ip]}
+                        {'name': 'ansible_ssh_host',
+                         'value': host[instance_ip]}
                         ]}
                 )
             if not self.options['add_node']:
@@ -189,7 +232,8 @@ class CfgInventory(object):
                     var_str = r.group(2)
                     hostvars = list()
                     for var in var_str.split(','):
-                        hostvars.append({'name': var.split('=')[0], 'value': var.split('=')[1]})
+                        hostvars.append({'name': var.split('=')[0],
+                                         'value': var.split('=')[1]})
                 else:
                     inventory_hostname = host
                     hostvars = []
@@ -222,25 +266,44 @@ class CfgInventory(object):
                 )
         return(new_inventory)
 
-    def write_inventory(self, masters, nodes, etcds, elastics, glusters, keepaliveds):
-        '''Generates inventory'''
-        inventory = self.format_inventory(masters, nodes, etcds, elastics, glusters, keepaliveds)
+    def write_inventory(self, masters, nodes, etcds,
+                        elastics, glusters, keepaliveds):
+        '''Generates inventory.'''
+        failed = False
+        inventory = self.format_inventory(masters, nodes, etcds,
+                                          elastics, glusters, keepaliveds)
         if not self.options['add_node']:
             if (('masters_list' in self.options.keys() and len(masters) < 2) or
                ('masters_list' not in self.options.keys() and len(nodes) < 2)):
-                display.warning('You should set at least 2 masters')
+                display.error('You should set at least 2 masters')
+                failed = True
             if (('etcds_list' in self.options.keys() and len(etcds) < 3) or
                ('etcds_list' not in self.options.keys() and len(nodes) < 3)):
-                display.warning('You should set at least 3 nodes for etcd clustering')
-            if (('elastics_list' in self.options.keys() and len(elastics) < 3) or
-               ('elastics_list' not in self.options.keys and len(nodes) < 3)):
-                display.warning('You should set at least 3 nodes for elasticsearch')
-            if (('glusters_list' in self.options.keys() and len(glusters) < 3) or
-               ('glusters_list' not in self.options.keys and len(nodes) < 3)):
-                display.warning('You should set at least 3 nodes for glusterfs cluster')
-            if (('keepaliveds_list' in self.options.keys() and len(keepaliveds) < 2) or
-               ('keepaliveds_list' not in self.options.keys and len(nodes) < 2)):
-                display.warning('You should set at least 2 nodes for keepalived')
+                display.error(('You should set at least 3'
+                               ' nodes for etcd clustering'))
+                failed = True
+            if (('elastics_list' in self.options.keys()
+                and len(elastics) < 3) or
+               ('elastics_list' not in self.options.keys()
+               and len(nodes) < 3)):
+                display.error(('You should set at least 3'
+                               ' nodes for elasticsearch'))
+                failed = True
+            if (('glusters_list' in self.options.keys()
+                and len(glusters) < 3) or
+               ('glusters_list' not in self.options.keys()
+               and len(nodes) < 3)):
+                display.error(('You should set at least 3'
+                               ' nodes for glusterfs cluster'))
+                failed = True
+            if (('keepaliveds_list' in self.options.keys()
+                and len(keepaliveds) < 2) or
+               ('keepaliveds_list' not in self.options.keys()
+               and len(nodes) < 2)):
+                display.error('You should set at least 2 nodes for keepalived')
+                failed = True
+        if failed and not self.options['force']:
+            sys.exit(1)
         open(self.inventorycfg, 'w').close()
         for key, value in inventory.items():
             self.cparser.add_section(key)
@@ -259,8 +322,8 @@ class CfgInventory(object):
                 % self.inventorycfg, color='green'
             )
 
+
 def prepare(options):
-    print options
     if options['is_openstack']:
         platform = 'openstack'
     else:
@@ -276,20 +339,23 @@ def prepare(options):
     )
 if __name__ == "__main__":
     # Main parser
-    parser = argparse.ArgumentParser(
-        prog='generator',
-        description='%(prog)s Kubernetes cluster deployment tool'
-    )
+    parser = argparse.ArgumentParser()
 
     parser.add_argument(
         '-i', '--inventory', dest='inventory_path', required=True,
-        help='Inventory file path. Defaults to <path parameter>/inventory/inventory.cfg'
+        help=('Inventory file path. Defaults to '
+              '<path parameter>/inventory.cfg')
     )
     parser.add_argument(
         '-o', '--openstack', dest='is_openstack', action='store_true',
         help=''
     )
-    parser.add_argument('--add', dest='add_node', action='store_true',
+    parser.add_argument(
+        '-f', '--force', dest='force', action='store_true',
+        help='Ignores errors with count of nodes while creating inventory'
+    )
+    parser.add_argument(
+        '--add', dest='add_node', action='store_true',
         help="Add node to an existing cluster"
     )
     parser.add_argument(
@@ -298,7 +364,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--masters', dest='masters_list', metavar='N', nargs='+', default=[],
-        help='Number of masters, these instances will not run workloads, master components only'
+        help=('Number of masters, these instances will not '
+              'run workloads, master components only')
     )
     parser.add_argument(
         '--nodes', dest='nodes_list', metavar='N', nargs='+',
@@ -309,18 +376,16 @@ if __name__ == "__main__":
         help='Number of elastic search nodes'
     )
     parser.add_argument(
-        '--keepaliveds', dest='keepaliveds_list', metavar='N', nargs='+', default=[],
-        help='Number of keepalived nodes'
+        '--keepaliveds', dest='keepaliveds_list', metavar='N',
+        nargs='+', default=[], help='Number of keepalived nodes'
     )
     parser.add_argument(
         '--glusters', dest='glusters_list', metavar='N', nargs='+', default=[],
         help='Number of glusters nodes'
     )
 
-
     # Parse arguments
     args = parser.parse_args()
     if args.inventory_path is None:
-        args.configfile = 'inventory.yml'
+        args.configfile = 'inventory.cfg'
     prepare(vars(args))
-
