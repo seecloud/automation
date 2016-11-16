@@ -350,8 +350,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         '-i', '--inventory', dest='inventory_path', required=True,
-        help=('Inventory file path. Defaults to '
-              '<path parameter>/inventory.cfg')
+        help=('Inventory file path')
     )
     parser.add_argument(
         '-o', '--openstack', dest='is_openstack', action='store_true',

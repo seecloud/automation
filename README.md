@@ -36,7 +36,7 @@ Example:
 ```
 2.1 For now you can use inventory.cfg generator, based on Kargo inventory generator. That script allow you generate inventory file for ansible automation, with passing roles as parameters. For example (option -f means "ignore errors", use it very carefully):
 ```
-python generator.py --nodes node1[ansible_ssh_host=10.99.21.1] node3[ansible_ssh_host=10.99.21.3] -f
+python utils/inventory-generator -i inventory/inventory.cfg --nodes node1[ansible_ssh_host=10.99.21.1] node3[ansible_ssh_host=10.99.21.3] -f
 ```
 will generate for you next inventory file:
 ```
