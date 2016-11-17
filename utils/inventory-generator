@@ -23,13 +23,10 @@ based on Kargo inventory generator
 """
 
 import argparse
-import random
 import re
-import string
 import sys
 
 import ansible.utils.display as display
-import requests
 
 display = display.Display()
 
@@ -37,24 +34,6 @@ try:
     import configparser
 except ImportError:
     import ConfigParser as configparser
-
-
-def id_generator(size=6, chars=string.ascii_lowercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
-
-
-def get_cluster_name():
-    try:
-        word_site = ("http://svnweb.freebsd.org/csrg/share/dict/"
-                     "words?view=co&content-type=text/plain")
-        response = requests.get(word_site)
-        words = response.content.splitlines()
-        cluster_name = random.choice(words).decode("utf-8")
-    except Exception:
-        cluster_name = id_generator()
-    if not re.match('^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', cluster_name):
-        get_cluster_name()
-    return(cluster_name.lower())
 
 
 class CfgInventory(object):
@@ -173,13 +152,7 @@ class CfgInventory(object):
         if self.platform is 'openstack':
             if self.options['add_node']:
                 current_inventory = self.read_inventory()
-                cluster_name = '-'.join(
-                    (current_inventory['all']['hosts']
-                     [0]['hostname']).split('-')[:-1]
-                )
                 new_inventory = current_inventory
-            else:
-                cluster_name = 'k8s-' + get_cluster_name()
             if self.options['use_private_ip']:
                 instance_ip = 'private_ip'
             else:
@@ -241,7 +214,9 @@ class CfgInventory(object):
                 if inventory_hostname not in hostnames.keys():
                     hostnames[inventory_hostname] = hostvars
                 elif hostvars != hostnames[inventory_hostname]:
-                    hostnames[inventory_hostname] = hostvars + hostnames[inventory_hostname]
+                    hostnames[inventory_hostname] = (hostvars +
+                                                     hostnames
+                                                     [inventory_hostname])
 
             for host, hostvars in hostnames.iteritems():
                     new_inventory['all']['hosts'].append(
@@ -320,7 +295,8 @@ class CfgInventory(object):
                 for var in host['hostvars']:
                     varlist.append("%s=%s" % (var['name'], var['value']))
                 hostvars = " ".join(varlist)
-                self.cparser.set(key, "%s\t\t%s" % (host['hostname'], hostvars))
+                self.cparser.set(key, "%s\t\t%s" % (host['hostname'],
+                                                    hostvars))
         with open(self.inventorycfg, 'wb') as configfile:
             display.banner('WRITTING INVENTORY')
             self.cparser.write(configfile)
