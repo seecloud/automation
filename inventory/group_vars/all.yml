@@ -6,7 +6,9 @@ bin_dir: /usr/local/bin
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
-local_release_dir: "/tmp/releases"
+local_artifactory_dir: "{{ playbook_dir }}/artifacts"
+container_destination_dir: "{{ playbook_dir }}//artifacts/containers"
+local_release_dir: /tmp
 # Random shifts for retrying failed ops like pushing/downloading
 retry_stagger: 5
 
@@ -126,7 +128,7 @@ dns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address')
 # If set the possible values are either 'gce', 'aws' or 'openstack'
 # When openstack is used make sure to source in the openstack credentials
 # like you would do when using nova-client before starting the playbook.
-# cloud_provider:
+cloud_provider: generic
 
 ## Set these proxy values in order to update docker daemon to use proxies
 # http_proxy: ""
@@ -137,7 +139,7 @@ dns_server: "{{ kube_service_addresses|ipaddr('net')|ipaddr(2)|ipaddr('address')
 ## This string should be exactly as you wish it to appear.
 ## An obvious use case is allowing insecure-registry access
 ## to self hosted registries like so:
-docker_options: "--insecure-registry={{ kube_service_addresses }}"
+#docker_options: "--insecure-registry={{ kube_service_addresses }}"
 
 # default packages to install within the cluster
 kpm_packages: []

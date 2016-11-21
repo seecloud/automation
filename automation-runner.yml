@@ -1,6 +1,7 @@
 ---
 
 - hosts: all
+  gather_facts: true
 
 # Define variable
 # aceesable in different playbooks/roles
@@ -31,9 +32,8 @@
         elastic_search_docker_image: 'registry:5000/elasticsearch'
 # Keepalived
 # Virtual IP
-        docker_registry_virtual_ip:  '192.168.122.250'
+        docker_registry_virtual_ip:  '172.18.128.125'
         docker_registry_mount_point: '/opt/docker_registry_mount_point'
-
 
 
 #
@@ -42,19 +42,13 @@
         docker_registry_ip: "{{ docker_registry_virtual_ip }}"
         docker_registry_name: "{{ registry_name }}"
 #
-- hosts: pr1
+- hosts: keepalived_nodes[0]
   roles:
      - role: keepalived
        keepalived_state: "master"
        virtual_ip: "{{ docker_registry_virtual_ip }}"
 #
-- hosts: pr2
-  roles:
-     - role: keepalived
-       keepalived_state: "backup"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
-#
-- hosts: pr3
+- hosts: keepalived_nodes:!keepalived_nodes[0]
   roles:
      - role: keepalived
        keepalived_state: "backup"
@@ -103,3 +97,29 @@
       es_log_dir:       "{{ elastic_search_log_dir }}"
       es_backup_dir:    "{{ elastic_search_backup_dir }}"
       es_docker_image:  "{{ elastic_search_docker_image }}"
+
+
+- hosts: etcd:!k8s-cluster
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: etcd, tags: etcd }
+
+- hosts: k8s-cluster
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: etcd, tags: etcd }
+    - { role: kubernetes/node, tags: node }
+    - { role: network_plugin, tags: network, kube_network_plugin: calico }
+
+- hosts: kube-master
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: kubernetes/master, tags: master }
+
+- hosts: k8s-cluster
+  roles:
+    - { role: dnsmasq, tags: dnsmasq }
+
+- hosts: kube-master[0]
+  roles:
+    - { role: kubernetes-apps, tags: apps }
