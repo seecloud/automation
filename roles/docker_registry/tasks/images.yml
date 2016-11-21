@@ -2,7 +2,7 @@
 # Load available images in folder files/custom
 
 - name: Get list of images
-  shell: "ls -1 {{ role_path }}/files/custom/*.tar"
+  shell: "ls -1 {{ container_destination_dir }}/*.tar"
   register: docker_images
   delegate_to: localhost
   connection: local

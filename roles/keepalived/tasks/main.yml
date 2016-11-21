@@ -35,7 +35,7 @@
 #    owner=root
 #    mode=0744
 
-- include: 100_install_keepalived.yaml
+- include: 100_check_keepalived.yaml
 
 - include: 110_configure_keepalived.yaml
 
