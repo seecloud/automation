@@ -1,12 +1,13 @@
 ---
 dependencies:
-  - role: download
+  - role: settings
+  - role: kargo_preconfigure
     file: "{{ downloads.calico_cni_plugin }}"
-  - role: download
+  - role: kargo_preconfigure
     file: "{{ downloads.calico_cni_plugin_ipam }}"
-  - role: download
+  - role: kargo_preconfigure
     file: "{{ downloads.calico_node }}"
-  - role: download
+  - role: kargo_preconfigure
     file: "{{ downloads.calicoctl }}"
-  - role: download
+  - role: kargo_preconfigure
     file: "{{ downloads.hyperkube }}"

@@ -1,4 +1,5 @@
 ---
 dependencies:
-  - role: download
+  - role: settings
+  - role: kargo_preconfigure
     file: "{{ downloads.hyperkube }}"
