@@ -303,8 +303,9 @@ class CfgInventory(object):
                           % (self.options['inventory_path'], e)
                           )
             sys.exit(1)
-        expected_sections = ['kube-node', 'kube-master', 'all', 'etcd',
-                             'k8s-cluster:children']
+        expected_sections = ['kube-node', 'kube-master', 'all', 'all:vars',
+                             'etcd', 'elasticsearch_nodes', 'glusterfs_nodes',
+                             'keepalived_nodes', 'k8s-cluster:children']
         for k in expected_sections:
             if k not in read_cparser.sections():
                 display.error(
@@ -357,32 +358,32 @@ class CfgInventory(object):
         inventory = self.format_inventory(masters, nodes, etcds,
                                           elastics, glusters, keepaliveds)
         if not self.options['add_node']:
-            if (('masters_list' in self.options.keys() and len(masters) < 2) or
-               ('masters_list' not in self.options.keys() and len(nodes) < 2)):
+            if ((self.options['masters_list'] != [] and len(masters) < 2) or
+               (self.options['masters_list'] == [] and len(nodes) < 2)):
                 display.error('You should set at least 2 masters')
                 failed = True
-            if (('etcds_list' in self.options.keys() and len(etcds) < 3) or
-               ('etcds_list' not in self.options.keys() and len(nodes) < 3)):
+            if ((self.options['etcds_list'] != [] and len(etcds) < 3) or
+               (self.options['etcds_list'] == [] and len(nodes) < 3)):
                 display.error(('You should set at least 3'
                                ' nodes for etcd clustering'))
                 failed = True
-            if (('elastics_list' in self.options.keys()
+            if ((self.options['elastics_list'] != []
                 and len(elastics) < 3) or
-               ('elastics_list' not in self.options.keys()
+               (self.options['elastics_list'] == []
                and len(nodes) < 3)):
                 display.error(('You should set at least 3'
                                ' nodes for elasticsearch'))
                 failed = True
-            if (('glusters_list' in self.options.keys()
+            if ((self.options['glusters_list'] != []
                 and len(glusters) < 3) or
-               ('glusters_list' not in self.options.keys()
+               (self.options['glusters_list'] == []
                and len(nodes) < 3)):
                 display.error(('You should set at least 3'
                                ' nodes for glusterfs cluster'))
                 failed = True
-            if (('keepaliveds_list' in self.options.keys()
+            if ((self.options['keepaliveds_list'] != []
                 and len(keepaliveds) < 2) or
-               ('keepaliveds_list' not in self.options.keys()
+               (self.options['keepaliveds_list'] == []
                and len(nodes) < 2)):
                 display.error('You should set at least 2 nodes for keepalived')
                 failed = True
