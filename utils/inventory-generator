@@ -46,7 +46,8 @@ class CfgInventory(object):
         self.cparser = configparser.ConfigParser(allow_no_value=True)
         self.inventory = {'all': {'hosts': []},
                           'all:vars': {'hosts': [
-                              {'hostname': 'ansible_user="root"', 'hostvars': []}]},
+                              {'hostname': 'ansible_user="root"',
+                               'hostvars': []}]},
                           'kube-master': {'hosts': []},
                           'etcd': {'hosts': []},
                           'elasticsearch_nodes': {'hosts': []},
@@ -63,7 +64,8 @@ class CfgInventory(object):
                          elastics, glusters, keepaliveds):
         new_inventory = {'all': {'hosts': []},
                          'all:vars': {'hosts': [
-                              {'hostname': 'ansible_user="root"', 'hostvars': []}]},
+                             {'hostname': 'ansible_user="root"',
+                              'hostvars': []}]},
                          'kube-master': {'hosts': []},
                          'etcd': {'hosts': []},
                          'elasticsearch_nodes': {'hosts': []},
@@ -77,11 +79,10 @@ class CfgInventory(object):
                          }
         hostnames = {}
         if self.options['user']:
-            print self.options['user']
             # handle user
-            print new_inventory['all:vars']
-            new_inventory['all:vars']['hosts'][0]['hostname'] = \
-                'ansible_ssh_user="{}"'.format(self.options['user'])
+            (new_inventory['all:vars']['hosts'][0]
+             ['hostname']) = ('ansible_ssh_user="{}"'.
+                              format(self.options['user']))
 
         if self.platform == 'openstack':
             if self.options['floating_ip']:
@@ -220,7 +221,7 @@ class CfgInventory(object):
                     )
         elif self.platform == 'metal':
             for host in (nodes + masters + etcds +
-                                         elastics + glusters + keepaliveds):
+                         elastics + glusters + keepaliveds):
                 if '[' in host:
                     r = re.search('(^.*)\[(.*)\]', host)
                     inventory_hostname = r.group(1)
@@ -398,6 +399,15 @@ class CfgInventory(object):
                 hostvars = " ".join(varlist)
                 self.cparser.set(key, "%s\t\t%s" % (host['hostname'],
                                                     hostvars))
+
+        print('YOUR CONFIG:')
+        sections = self.cparser.sections()
+        for section in sections:
+            print('SECTION: ' + section)
+            print('VALUES: ' + ', '.join([x[0].strip() for
+                                          x in self.cparser.items(section)])
+                  + '\n')
+
         with open(self.inventorycfg, 'wb') as configfile:
             display.banner('WRITTING INVENTORY')
             self.cparser.write(configfile)
@@ -467,7 +477,7 @@ if __name__ == "__main__":
         help='Number of glusters nodes'
     )
     parser.add_argument(
-        '--user', dest='user', help='Allow override default root user in config'
+        '--user', dest='user', help='Allow override default user in config'
     )
 
     # Parse arguments
