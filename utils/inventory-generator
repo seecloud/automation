@@ -1,0 +1,488 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright 2016: Mirantis Inc.
+# All Rights Reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+"""
+inventory_generator
+~~~~~~~~~~~~~~~~~~~
+
+Ansible inventory generator for seecloud automation,
+based on Kargo inventory generator
+"""
+
+import argparse
+import re
+import sys
+
+import ansible.utils.display as display
+
+display = display.Display()
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
+
+
+class CfgInventory(object):
+    """Read classic ansible inventory file."""
+
+    def __init__(self, options, platform):
+        self.options = options
+        self.platform = platform
+        self.inventorycfg = options['inventory_path']
+        self.cparser = configparser.ConfigParser(allow_no_value=True)
+        self.inventory = {'all': {'hosts': []},
+                          'all:vars': {'hosts': [
+                              {'hostname': 'ansible_user="root"',
+                               'hostvars': []}]},
+                          'kube-master': {'hosts': []},
+                          'etcd': {'hosts': []},
+                          'elasticsearch_nodes': {'hosts': []},
+                          'glusterfs_nodes': {'hosts': []},
+                          'keepalived_nodes': {'hosts': []},
+                          'kube-node': {'hosts': []},
+                          'k8s-cluster:children': {'hosts': [
+                              {'hostname': 'kube-node', 'hostvars': []},
+                              {'hostname': 'kube-master', 'hostvars': []}
+                          ]},
+                          }
+
+    def format_inventory(self, masters, nodes, etcds,
+                         elastics, glusters, keepaliveds):
+        new_inventory = {'all': {'hosts': []},
+                         'all:vars': {'hosts': [
+                             {'hostname': 'ansible_user="root"',
+                              'hostvars': []}]},
+                         'kube-master': {'hosts': []},
+                         'etcd': {'hosts': []},
+                         'elasticsearch_nodes': {'hosts': []},
+                         'glusterfs_nodes': {'hosts': []},
+                         'keepalived_nodes': {'hosts': []},
+                         'kube-node': {'hosts': []},
+                         'k8s-cluster:children': {'hosts': [
+                             {'hostname': 'kube-node', 'hostvars': []},
+                             {'hostname': 'kube-master', 'hostvars': []}
+                             ]},
+                         }
+        hostnames = {}
+        if self.options['user']:
+            # handle user
+            (new_inventory['all:vars']['hosts'][0]
+             ['hostname']) = ('ansible_ssh_user="{}"'.
+                              format(self.options['user']))
+
+        if self.platform == 'openstack':
+            if self.options['floating_ip']:
+                ip_type = 'public_v4'
+            else:
+                ip_type = 'private_v4'
+            # handle masters
+            new_instances = []
+            for master in masters:
+                new_instances.append({'public_ip': (master['openstack']
+                                                    [ip_type]),
+                                      'name': master['item']})
+            masters = new_instances
+            # handle nodes
+            new_instances = []
+            for node in nodes:
+                new_instances.append({'public_ip': node['openstack'][ip_type],
+                                      'name': node['item']})
+            nodes = new_instances
+            # handle etcds
+            new_instances = []
+            for etcd in etcds:
+                new_instances.append({'public_ip': etcd['openstack'][ip_type],
+                                      'name': etcd['item']})
+            etcds = new_instances
+            # handle elastics
+            new_instances = []
+            for elastic in elastics:
+                new_instances.append({'public_ip': (elastic['openstack']
+                                                    [ip_type]),
+                                      'name': elastic['item']})
+            elastics = new_instances
+            # handle glusterfs
+            new_instances = []
+            for gluster in glusters:
+                new_instances.append({'public_ip': (gluster['openstack']
+                                                    [ip_type]),
+                                      'name': gluster['item']})
+            glusters = new_instances
+            # handle keepaliveds
+            new_instances = []
+            for keepalived in keepaliveds:
+                new_instances.append({'public_ip': (keepalived['openstack']
+                                                    [ip_type]),
+                                      'name': keepalived['item']})
+            keepaliveds = new_instances
+
+        if not self.options['add_node']:
+            if len(nodes) < 3:
+                if not masters and len(nodes) == 1:
+                    masters = [nodes[0]]
+                elif not masters:
+                    masters = nodes[0:2]
+                if not etcds and len(nodes) >= 3:
+                    etcds = nodes[0:3]
+                elif not etcds and len(nodes) < 3:
+                    etcds = [nodes[0]]
+                elif etcds and len(etcds) < 3:
+                    etcds = [etcds[0]]
+                if not elastics and len(nodes) >= 3:
+                    elastics = nodes[0:3]
+                elif not elastics and len(nodes) < 3:
+                    elastics = [nodes[0]]
+                elif elastics and len(elastics) < 3:
+                    elastics = [elastics[0]]
+                if not glusters and len(nodes) >= 3:
+                    glusters = nodes[0:3]
+                elif not glusters and len(nodes) < 3:
+                    glusters = [nodes[0]]
+                elif glusters and len(glusters) < 3:
+                    glusters = [glusters[0]]
+                if not keepaliveds and len(nodes) >= 2:
+                    keepaliveds = nodes[0:2]
+                elif not keepaliveds and len(nodes) < 2:
+                    keepaliveds = [nodes[0]]
+                elif keepaliveds and len(keepaliveds) < 2:
+                    keepaliveds = [keepaliveds[0]]
+            else:
+                if not masters:
+                    masters = nodes[0:2]
+                if not etcds:
+                    etcds = nodes[0:3]
+                if not elastics:
+                    elastics = nodes[0:3]
+                if not glusters:
+                    glusters = nodes[0:3]
+                if not keepaliveds:
+                    keepaliveds = nodes[0:2]
+        else:
+            current_inventory = self.read_inventory()
+            new_inventory = current_inventory
+
+        if self.platform is 'openstack':
+            if self.options['use_private_ip']:
+                instance_ip = 'private_ip'
+            else:
+                instance_ip = 'public_ip'
+            for host in (nodes + masters + etcds +
+                         elastics + glusters + keepaliveds):
+                new_inventory['all']['hosts'].append(
+                    {'hostname': '%s' % host['name'], 'hostvars': [
+                        {'name': 'ansible_ssh_host',
+                         'value': host[instance_ip]}
+                        ]}
+                )
+            if not self.options['add_node']:
+                for host in nodes:
+                    new_inventory['kube-node']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+                for host in masters:
+                    new_inventory['kube-master']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+                for host in etcds:
+                    new_inventory['etcd']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+                for host in elastics:
+                    new_inventory['elasticsearch_nodes']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+                for host in glusters:
+                    new_inventory['glusterfs_nodes']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+                for host in keepaliveds:
+                    new_inventory['keepalived_nodes']['hosts'].append(
+                        {'hostname': '%s' % host['name'],
+                         'hostvars': []}
+                    )
+        elif self.platform == 'metal':
+            for host in (nodes + masters + etcds +
+                         elastics + glusters + keepaliveds):
+                if '[' in host:
+                    r = re.search('(^.*)\[(.*)\]', host)
+                    inventory_hostname = r.group(1)
+                    var_str = r.group(2)
+                    hostvars = list()
+                    for var in var_str.split(','):
+                        hostvars.append({'name': var.split('=')[0],
+                                         'value': var.split('=')[1]})
+                else:
+                    inventory_hostname = host
+                    hostvars = []
+
+                if inventory_hostname not in hostnames.keys():
+                    hostnames[inventory_hostname] = hostvars
+                elif hostvars != hostnames[inventory_hostname]:
+                    hostnames[inventory_hostname] = (hostvars +
+                                                     hostnames
+                                                     [inventory_hostname])
+
+            for host, hostvars in hostnames.iteritems():
+                new_inventory['all']['hosts'].append(
+                    {'hostname': host, 'hostvars': hostvars}
+                )
+            for host in nodes:
+                new_inventory['kube-node']['hosts'].append(
+                    {'hostname': host.split('[')[0], 'hostvars': []}
+                )
+            for host in masters:
+                new_inventory['kube-master']['hosts'].append(
+                    {'hostname': host.split('[')[0], 'hostvars': []}
+                )
+            if self.options['add_node']:
+                if len(new_inventory['etcd']['hosts']) < 3:
+                    new_inventory['etcd']['hosts'].append(
+                        {'hostname': hostnames.keys()[-1].split('[')[0],
+                         'hostvars': []}
+                    )
+                if len(new_inventory['elasticsearch_nodes']['hosts']) < 3:
+                    new_inventory['elasticsearch_nodes']['hosts'].append(
+                        {'hostname': hostnames.keys()[-1].split('[')[0],
+                         'hostvars': []}
+                    )
+                if len(new_inventory['glusterfs_nodes']['hosts']) < 3:
+                    new_inventory['glusterfs_nodes']['hosts'].append(
+                        {'hostname': hostnames.keys()[-1].split('[')[0],
+                         'hostvars': []}
+                    )
+                if len(new_inventory['keepalived_nodes']['hosts']) < 2:
+                    new_inventory['keepalived_nodes']['hosts'].append(
+                        {'hostname': hostnames.keys()[-1].split('[')[0],
+                         'hostvars': []}
+                    )
+            else:
+                for host in etcds:
+                    new_inventory['etcd']['hosts'].append(
+                        {'hostname': host.split('[')[0], 'hostvars': []}
+                    )
+                for host in elastics:
+                    new_inventory['elasticsearch_nodes']['hosts'].append(
+                        {'hostname': host.split('[')[0], 'hostvars': []}
+                    )
+                for host in glusters:
+                    new_inventory['glusterfs_nodes']['hosts'].append(
+                        {'hostname': host.split('[')[0], 'hostvars': []}
+                    )
+                for host in keepaliveds:
+                    new_inventory['keepalived_nodes']['hosts'].append(
+                        {'hostname': host.split('[')[0], 'hostvars': []}
+                    )
+        return new_inventory
+
+    def read_inventory(self):
+        """Read inventory."""
+        read_cparser = configparser.ConfigParser(allow_no_value=True)
+        try:
+            read_cparser.read(self.inventorycfg)
+        except IOError as e:
+            display.error('Cannot read configuration %s: %s'
+                          % (self.options['inventory_path'], e)
+                          )
+            sys.exit(1)
+        expected_sections = ['kube-node', 'kube-master', 'all', 'all:vars',
+                             'etcd', 'elasticsearch_nodes', 'glusterfs_nodes',
+                             'keepalived_nodes', 'k8s-cluster:children']
+        for k in expected_sections:
+            if k not in read_cparser.sections():
+                display.error(
+                    'The config file %s doesn\'t have a section named %s'
+                    % (self.options['inventory_path'], k)
+                )
+                sys.exit(1)
+
+        current_inventory = {'all': {'hosts': []},
+                             'all:vars': {'hosts': [
+                                 {'hostname': 'ansible_user="root"'}]},
+                             'kube-master': {'hosts': []},
+                             'etcd': {'hosts': []},
+                             'elasticsearch_nodes': {'hosts': []},
+                             'glusterfs_nodes': {'hosts': []},
+                             'keepalived_nodes': {'hosts': []},
+                             'kube-node': {'hosts': []},
+                             'k8s-cluster:children': {'hosts': [
+                                 {'hostname': 'kube-node', 'hostvars': []},
+                                 {'hostname': 'kube-master', 'hostvars': []}
+                             ]},
+                             }
+
+        for section in current_inventory.keys():
+            for line, properties_str in read_cparser.items(section):
+                machine_part = line.split('#', 1)[
+                    0]  # get rid of comments parts
+                machine_part = line.split(None, 1)
+                inventory_hostname = machine_part[0]
+                host_dict = {'hostname': '', 'hostvars': []}
+                hostvars = []
+                if len(machine_part) == 2:
+                    if properties_str:
+                        properties_str = machine_part[1] + '=' + properties_str
+                    else:
+                        properties_str = machine_part[1]
+                    for hostvar in properties_str.split():
+                        name, value = hostvar.split('=')
+                        d = {'name': name, 'value': value}
+                        hostvars.append(d)
+                host_dict['hostname'] = inventory_hostname
+                host_dict['hostvars'] = hostvars
+                current_inventory[section]['hosts'].append(host_dict)
+        return current_inventory
+
+    def write_inventory(self, masters, nodes, etcds,
+                        elastics, glusters, keepaliveds):
+        """Generates inventory."""
+        failed = False
+        inventory = self.format_inventory(masters, nodes, etcds,
+                                          elastics, glusters, keepaliveds)
+        if not self.options['add_node']:
+            if ((self.options['masters_list'] != [] and len(masters) < 2) or
+               (self.options['masters_list'] == [] and len(nodes) < 2)):
+                display.error('You should set at least 2 masters')
+                failed = True
+            if ((self.options['etcds_list'] != [] and len(etcds) < 3) or
+               (self.options['etcds_list'] == [] and len(nodes) < 3)):
+                display.error(('You should set at least 3'
+                               ' nodes for etcd clustering'))
+                failed = True
+            if ((self.options['elastics_list'] != []
+                and len(elastics) < 3) or
+               (self.options['elastics_list'] == []
+               and len(nodes) < 3)):
+                display.error(('You should set at least 3'
+                               ' nodes for elasticsearch'))
+                failed = True
+            if ((self.options['glusters_list'] != []
+                and len(glusters) < 3) or
+               (self.options['glusters_list'] == []
+               and len(nodes) < 3)):
+                display.error(('You should set at least 3'
+                               ' nodes for glusterfs cluster'))
+                failed = True
+            if ((self.options['keepaliveds_list'] != []
+                and len(keepaliveds) < 2) or
+               (self.options['keepaliveds_list'] == []
+               and len(nodes) < 2)):
+                display.error('You should set at least 2 nodes for keepalived')
+                failed = True
+        if len(nodes) < 3 and failed and not self.options['force']:
+            sys.exit(1)
+        elif len(nodes) >= 3 and failed and not self.options['force']:
+            sys.exit(2)
+        open(self.inventorycfg, 'w').close()
+        for key, value in inventory.items():
+            self.cparser.add_section(key)
+            for host in value['hosts']:
+                hostvars = str()
+                varlist = list()
+                for var in host['hostvars']:
+                    varlist.append("%s=%s" % (var['name'], var['value']))
+                hostvars = " ".join(varlist)
+                self.cparser.set(key, "%s\t\t%s" % (host['hostname'],
+                                                    hostvars))
+
+        print('YOUR CONFIG:')
+        sections = self.cparser.sections()
+        for section in sections:
+            print('SECTION: ' + section)
+            print('VALUES: ' + ', '.join([x[0].strip() for
+                                          x in self.cparser.items(section)])
+                  + '\n')
+
+        with open(self.inventorycfg, 'wb') as configfile:
+            display.banner('WRITTING INVENTORY')
+            self.cparser.write(configfile)
+            display.display(
+                'Inventory generated : %s'
+                % self.inventorycfg, color='green'
+            )
+
+
+def prepare(options):
+    if options['is_openstack']:
+        platform = 'openstack'
+    else:
+        platform = 'metal'
+    Cfg = CfgInventory(options, platform)
+    Cfg.write_inventory(
+        options['masters_list'],
+        options['nodes_list'],
+        options['etcds_list'],
+        options['elastics_list'],
+        options['glusters_list'],
+        options['keepaliveds_list']
+    )
+if __name__ == "__main__":
+    # Main parser
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '-i', '--inventory', dest='inventory_path',
+        default='inventory/inventory.cfg', help='Inventory file path'
+    )
+    parser.add_argument(
+        '-o', '--openstack', dest='is_openstack', action='store_true',
+        help=''
+    )
+    parser.add_argument(
+        '-f', '--force', dest='force', action='store_true',
+        help='Ignores errors with count of nodes while creating inventory'
+    )
+    parser.add_argument(
+        '--add', dest='add_node', action='store_true',
+        help="Add node to an existing cluster"
+    )
+    parser.add_argument(
+        '--etcds', dest='etcds_list', metavar='N', nargs='+', default=[],
+        help='Number of etcd, these instances will just act as etcd members'
+    )
+    parser.add_argument(
+        '--masters', dest='masters_list', metavar='N', nargs='+', default=[],
+        help=('Number of masters, these instances will not '
+              'run workloads, master components only')
+    )
+    parser.add_argument(
+        '--nodes', dest='nodes_list', metavar='N', nargs='+',
+        required=True, help='List of nodes'
+    )
+    parser.add_argument(
+        '--elastics', dest='elastics_list', metavar='N', nargs='+', default=[],
+        help='Number of elastic search nodes'
+    )
+    parser.add_argument(
+        '--registries', dest='keepaliveds_list', metavar='N',
+        nargs='+', default=[], help='Number of keepalived nodes'
+    )
+    parser.add_argument(
+        '--glusters', dest='glusters_list', metavar='N', nargs='+', default=[],
+        help='Number of glusters nodes'
+    )
+    parser.add_argument(
+        '--user', dest='user', help='Allow override default user in config'
+    )
+
+    # Parse arguments
+    args = parser.parse_args()
+    prepare(vars(args))

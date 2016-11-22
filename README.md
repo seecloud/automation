@@ -34,6 +34,46 @@ Example:
     [all:vars]
     ansible_user="root"
 ```
+2.1 For now you can use inventory.cfg generator, based on Kargo inventory generator. That script allow you generate inventory file for ansible automation, with passing roles as parameters. For example (option -f means "ignore errors", use it very carefully):
+```
+python utils/inventory-generator -i inventory/inventory.cfg --nodes node1[ansible_ssh_host=10.99.21.1] node3[ansible_ssh_host=10.99.21.3] -f
+```
+will generate for you next inventory file:
+```
+[all]
+node1		ansible_ssh_host=10.99.21.1
+node3		ansible_ssh_host=10.99.21.3
+
+[keepalived_nodes]
+node1		
+node3		
+
+[etcd]
+node1		
+
+[elasticsearch_nodes]
+node1		
+
+[kube-master]
+node1		
+node3		
+
+[glusterfs_nodes]
+node1		
+
+[all:vars]
+ansible_user="root"
+    
+[k8s-cluster:children]
+kube-node		
+kube-master		
+
+[kube-node]
+node1		
+node3
+```
+You also can use --user option, if you want override ansible user. By default, this parameter is root.
+
 3. Edit init_runner.yml with proper roles for keepalived/registry  
 Example
 ```
