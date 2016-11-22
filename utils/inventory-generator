@@ -389,6 +389,8 @@ class CfgInventory(object):
                 failed = True
         if len(nodes) < 3 and failed and not self.options['force']:
             sys.exit(1)
+        elif len(nodes) >= 3 and failed and not self.options['force']:
+            sys.exit(2)
         open(self.inventorycfg, 'w').close()
         for key, value in inventory.items():
             self.cparser.add_section(key)
