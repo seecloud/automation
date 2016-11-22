@@ -61,6 +61,9 @@ node3
 [glusterfs_nodes]
 node1		
 
+[all:vars]
+ansible_user="root"
+    
 [k8s-cluster:children]
 kube-node		
 kube-master		
@@ -69,6 +72,7 @@ kube-master
 node1		
 node3
 ```
+You also can use --user option, if you want override ansible user. By default, this parameter is root.
 
 3. Edit init_runner.yml with proper roles for keepalived/registry  
 Example
