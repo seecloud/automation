@@ -1,0 +1,42 @@
+builder:
+  push: True
+registry:
+  address: "127.0.0.1:31500"
+nodes:
+  node[1-3]:
+    roles:
+      - infra
+      - frontend
+      - backend
+kubernetes:
+  namespace: oss
+images:
+  namespace: oss
+repositories:
+  repos:
+    - name: fuel-ccp-debian-base
+      git_url: https://github.com/openstack/fuel-ccp-debian-base
+    - name: fuel-ccp-entrypoint
+      git_url: https://github.com/openstack/fuel-ccp-entrypoint
+    - name: fuel-ccp-etcd
+      git_url: https://github.com/openstack/fuel-ccp-etcd
+    - name: fuel-devops-portal
+      git_url: https://github.com/seecloud/fuel-devops-portal
+    - name: ceagle
+      git_url: https://github.com/seecloud/ceagle
+    - name: health
+      git_url: https://github.com/seecloud/health
+    - name: availability
+      git_url: https://github.com/seecloud/availability
+    - name: performance
+      git_url: https://github.com/seecloud/performance
+roles:
+  infra:
+    - etcd
+  frontend:
+    - devops-portal
+  backend:
+    - ceagle
+    - health
+    - availability
+    - performance
