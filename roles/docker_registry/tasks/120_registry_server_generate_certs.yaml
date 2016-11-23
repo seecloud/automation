@@ -1,18 +1,45 @@
+- name: Create temporary openssl configuration | Ubuntu
+  command: "cp /etc/ssl/openssl.cnf {{ openssl_tmp_config }}"
+  args:
+    creates="{{ openssl_tmp_config }}"
+  register: first_attempt
+  ignore_errors: yes
+  run_once: true
+  delegate_to: localhost
+  connection: local
+
+- name: Create temporary openssl configuration | Centos
+  command: "cp /etc/pki/tls/openssl.cnf {{ openssl_tmp_config }}"
+  args: 
+    creates="{{ openssl_tmp_config }}"
+  when: first_attempt|failed
+  run_once: true
+  delegate_to: localhost
+  connection: local
+
+
+- name: Debug openssl configuration
+  debug: var=openssl_tmp_config
+  run_once: true
+  delegate_to: localhost
+  connection: local
 
 - name: Update ssl configuration
   blockinfile:
-    dest: /etc/ssl/openssl.cnf
+    dest: "{{ openssl_tmp_config }}"
     block: |
       [ alternate_names ]
       DNS.1        = registry
+  run_once: true
   delegate_to: localhost
   connection: local
 
 - name: Update openssl settings - allow AltNames
   lineinfile: >
-    dest=/etc/ssl/openssl.cnf
+    dest="{{ openssl_tmp_config }}"
     insertafter="^\[ v3_ca \]"
     line="subjectAltName = @alternate_names"
+  run_once: true
   delegate_to: localhost
   connection: local
 
@@ -22,7 +49,7 @@
 
 - name: Generate certs for registry TLS support
   shell: >
-    openssl req -newkey rsa:{{ key_length }} -nodes -sha256
+    openssl req -config {{ openssl_tmp_config }} -newkey rsa:{{ key_length }} -nodes -sha256
     -keyout {{ role_path }}/files/{{ key_name }}.key -x509 -days {{ valid_time }}
     -out {{ role_path }}/files/{{ key_name }}.crt
     -subj '/CN={{ container_address }}/O={{ company_name }}/C={{ company_country }}'
@@ -31,8 +58,13 @@
   delegate_to: localhost
   connection: local
 
-#- name: "Deploy certificate for server"
-#  shell: 'cp {{ registry_certs_path }}/{{ key_name }}.crt /etc/docker/certs.d/{{ container_address }}/{{ key_name }}.crt'
+
+- name: Remove temporary openssl config
+  file: path="{{ openssl_tmp_config }}" state=absent
+  delegate_to: localhost
+  connection: local
+  run_once: true
+
 
 - name: Copy Cert to Docker Registry Server
   copy:

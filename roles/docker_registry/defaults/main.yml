@@ -15,4 +15,4 @@ registry_role: "undefined"
 
 #docker
 docker_registry_tar: "/opt/docker_private_registry/roles/docker_registry/files/registry.tar"
-docker_custom_tars_path: "/opt/docker_private_registry/roles/docker_registry/files/custom"
+openssl_tmp_config: "/tmp/openssl.cnf"
