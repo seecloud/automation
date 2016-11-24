@@ -1,0 +1,13 @@
+registry_type: public
+items:
+  - etcd
+  - hyperkube
+  - elasticsearch
+  - calico_cni_plugin
+  - calico_cni_plugin_ipam
+  - calico_node
+  - calicoctl
+  - flannel_server_helper
+  - flannel
+  - weave
+download_items: "{{ items }}"

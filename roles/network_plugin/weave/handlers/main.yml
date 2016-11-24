@@ -1,0 +1,37 @@
+---
+- name: restart weave
+  command: /bin/true
+  notify:
+    - Weave | reload systemd
+    - reload weave
+
+- name : Weave | reload systemd
+  shell: systemctl daemon-reload
+  when: ansible_service_mgr == "systemd"
+
+- name: restart weaveproxy
+  command: /bin/true
+  notify:
+    - Weave | reload systemd
+    - reload weaveproxy
+
+- name: restart weaveexpose
+  command: /bin/true
+  notify:
+    - Weave | reload systemd
+    - reload weaveexpose
+
+- name: reload weave
+  service:
+    name: weave
+    state: restarted
+
+- name: reload weaveproxy
+  service:
+    name: weaveproxy
+    state: restarted
+
+- name: reload weaveexpose
+  service:
+    name: weaveexpose
+    state: restarted

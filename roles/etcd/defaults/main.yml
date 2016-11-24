@@ -1,0 +1,2 @@
+---
+etcd_bin_dir: "{{ local_release_dir }}/etcd/etcd-{{ etcd_version }}-linux-amd64/"

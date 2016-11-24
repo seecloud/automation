@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: settings
+  - role: kargo_preconfigure
+    file: "{{ downloads.flannel_server_helper }}"
+  - role: kargo_preconfigure
+    file: "{{ downloads.flannel }}"

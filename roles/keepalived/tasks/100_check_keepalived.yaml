@@ -1,0 +1,6 @@
+- name: Keepalived | Check keepalived
+  shell: rpm -qa | grep -q keepalived
+  register: package_installed
+  failed_when: package_installed.rc != 0
+  tags: keepalived
+  when: ansible_distribution == 'CentOS'

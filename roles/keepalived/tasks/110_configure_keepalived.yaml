@@ -1,4 +1,4 @@
-- name: Configure keepalived
+- name: Keepalived | Configure keepalived
   template: src=keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf
   tags: keepalived
   notify: restart keepalived

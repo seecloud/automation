@@ -1,0 +1,125 @@
+---
+
+- hosts: all
+  gather_facts: true
+
+# Define variable
+# aceesable in different playbooks/roles
+
+  pre_tasks:
+    - set_fact:
+# Volume names for Docker Registry and Elastic Search 
+        elastic_search_volume_name:  'elastic_backups'
+        docker_registry_volume_name: 'docker_registry'
+# Storage path for Docker Registry and Elastic Search
+        elastic_search_storage_dir:  '/opt/gluster_storage/elastic_search1'
+        docker_registry_storage_dir: '/opt/gluster_storage/docker_registry1'
+# UID and GID of ElasticSearch
+        elastic_search_user_id: '105'
+        elastic_search_group_id: '108'
+# UID and GID of Docker Registry
+        docker_registry_user_id: '0'
+        docker_registry_group_id: '0'
+
+# Docker Registry name
+        registry_name: 'registry'
+
+# ElasticSearch params.
+        elastic_search_backup_dir:   '/volumes/es_backup_dir'
+        elastic_search_data_dir:     '/volumes/es_data_dir'
+        elastic_search_config_dir:   '/volumes/es_config_dir'
+        elastic_search_log_dir:      '/volumes/es_log_dir'
+        elastic_search_docker_image: 'registry:5000/elasticsearch'
+# Keepalived
+# Virtual IP
+        docker_registry_virtual_ip:  '172.18.128.125'
+        docker_registry_mount_point: '/opt/docker_registry_mount_point'
+
+
+#
+  roles:
+      - role: common
+        docker_registry_ip: "{{ docker_registry_virtual_ip }}"
+        docker_registry_name: "{{ registry_name }}"
+#
+- hosts: keepalived_nodes[0]
+  roles:
+     - role: keepalived
+       keepalived_state: "master"
+       virtual_ip: "{{ docker_registry_virtual_ip }}"
+#
+- hosts: keepalived_nodes:!keepalived_nodes[0]
+  roles:
+     - role: keepalived
+       keepalived_state: "backup"
+       virtual_ip: "{{ docker_registry_virtual_ip }}"
+#
+#
+- hosts: glusterfs_nodes
+  roles:
+    - role: glusterfs_server
+      glusterfs_volume_name: "{{ docker_registry_volume_name }}"
+      glusterfs_storage_dir: "{{ docker_registry_storage_dir }}"
+    - role: glusterfs_server
+      glusterfs_volume_name:  "{{ elastic_search_volume_name }}"
+      glusterfs_storage_dir:  "{{ elastic_search_storage_dir }}"
+
+
+- hosts: keepalived_nodes
+  roles:
+    - role: glusterfs_client
+      glusterfs_mount_point:          "{{ docker_registry_mount_point }}"
+      glusterfs_volume_name:          "{{ docker_registry_volume_name }}"
+      glusterfs_mount_point_user_id:  "{{ docker_registry_user_id }}"
+      glusterfs_mount_point_group_id: "{{ docker_registry_group_id }}"
+    - role: docker_registry
+      registry_role: "server"
+      docker_registry_name: "{{ registry_name }}"
+
+
+- hosts: all
+  roles:
+    - role: docker_registry
+      registry_role: "client"
+      docker_registry_ip: "{{ docker_registry_virtual_ip }}"
+
+#
+- hosts: elasticsearch_nodes
+  roles:
+    - role: glusterfs_client
+      glusterfs_mount_point:          "{{ elastic_search_backup_dir }}"
+      glusterfs_volume_name:          "{{ elastic_search_volume_name }}"
+      glusterfs_mount_point_user_id:  "{{ elastic_search_user_id }}"
+      glusterfs_mount_point_group_id: "{{ elastic_search_group_id }}"
+    - role: elastic_search
+      es_data_dir:      "{{ elastic_search_data_dir }}"
+      es_config_dir:    "{{ elastic_search_config_dir }}"
+      es_log_dir:       "{{ elastic_search_log_dir }}"
+      es_backup_dir:    "{{ elastic_search_backup_dir }}"
+      es_docker_image:  "{{ elastic_search_docker_image }}"
+
+
+- hosts: etcd:!k8s-cluster
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: etcd, tags: etcd }
+
+- hosts: k8s-cluster
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: etcd, tags: etcd }
+    - { role: kubernetes/node, tags: node }
+    - { role: network_plugin, tags: network, kube_network_plugin: calico }
+
+- hosts: kube-master
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+    - { role: kubernetes/master, tags: master }
+
+- hosts: k8s-cluster
+  roles:
+    - { role: dnsmasq, tags: dnsmasq }
+
+- hosts: kube-master[0]
+  roles:
+    - { role: kubernetes-apps, tags: apps }

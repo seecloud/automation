@@ -1,86 +1,24 @@
-# Docker private registry
+# Automated deployment of the OSS infrastructure
+*Kubernetes deployment based on the roles, taken from [Kargo project](https://github.com/kubernetes-incubator/kargo)  
 #### Requirements
+1. CentOS7 nodes, installed from iso, which was builded by [OSS image builder](https://github.com/seecloud/os-image-builder)  
 1. Access to nodes via ssh key for root user
 2. Proper resolving by hostname on the machine, which you are using for deployment
 
-
-#### How to add additional docker images into your private registry during deployment?
-
-1. Pull image to your deployment machine:
-Example:
-```
-docker pull ubuntu
-```
-2. Save it into tar
-```
-docker save ubuntu -u ubuntu.tar
-```
-3. Put ubuntu.tar file into docker_private/registry/roles/docker_registry/files/custom. During deployment it will be copied to target machines and pushed into private registry.
-
 #### How to deploy
-1. Configure network settings for your registry (roles/common/defaults/main.yml)
+1. Generate inventory file (minimum required nodes - 3):
 ```
-docker_registry_name: "registry" # hostname for access 
-docker_registry_ip: "192.168.122.250" # virtual ip (should be in the proper network)
+utils/inventory-generator --nodes node1 node2 node3
 ```
-2. Add to inventory file under [all] section list with hostnames  
-Example:
+2. Run bootstrap playbook for loading required packages (required internet connection)
 ```
-    [all]
-    pr1
-    pr2
-    pr3
-
-    [all:vars]
-    ansible_user="root"
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/bootstrap.cfg bootstrap.yml
 ```
-3. Edit init_runner.yml with proper roles for keepalived/registry  
-Example
+3. Configure network settings for private registry in automation.yml
 ```
----
-- hosts: all
-  roles:
-      - common
-
-- hosts: pr1
-  roles:
-     - { role: keepalived, keepalived_state: "master" }
-
-- hosts: pr2
-  roles:
-     - { role: keepalived, keepalived_state: "backup" }
-
-- hosts: pr1
-  roles:
-      - { role: docker_registry, registry_role: "server"}
-
-- hosts: all
-  roles:
-      - { role: docker_registry, registry_role: "client"}
-
-
+docker_registry_ip: "192.168.122.250" # virtual ip (use free address in you environment network)
 ```
-4. Edit notify_runner.yml (this one is called during failover) with proper settings for docker registry server/clients
-Example
+4. Run playbook (doesn't require internet connection)
 ```
----
-- hosts: localhost
-  connection: local
-  roles:
-      - { role: docker_registry, registry_role: "server"}
-
-- hosts: all
-  roles:
-      - { role: docker_registry, registry_role: "client"}
-```
-
-5. Run playbook
-```
-cd docker_private_registry/
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory init_runner.yml
-```
-
-After deployment you can use registry in this way:
-```
-docker pull registry:5000/elasticsearch
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/automation.cfg automation-runner.yml
 ```
