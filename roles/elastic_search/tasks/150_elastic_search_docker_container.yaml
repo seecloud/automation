@@ -1,3 +1,8 @@
+- name: Elasticsearch | reload docker
+  service:
+    name: docker-latest
+    state: restarted
+
 - name: Elasticsearch container
   debug: var=download
 

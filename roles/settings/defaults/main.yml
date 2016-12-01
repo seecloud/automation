@@ -132,7 +132,7 @@ downloads:
 
 download:
   container: "{{ file.container|default('false') }}"
-  repo: "{{ registry }}{{ file.repo|default(None) }}"
+  repo: "{{ registry|default(None) }}{{ file.repo|default(None) }}"
   tag: "{{ file.tag|default(None) }}"
   enabled: "{{ file.enabled|default('true') }}"
   dest: "{{ file.dest|default(None) }}"
