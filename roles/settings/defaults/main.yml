@@ -143,3 +143,26 @@ download:
   unarchive: "{{ file.unarchive|default('false') }}"
   owner: "{{ file.owner|default('kube') }}"
   mode: "{{ file.mode|default(None) }}"
+
+# CCP settings
+pip_packages_folder: "pip_packages"
+ccp_path: fuel-ccp
+ccp_repositories_path: "ccp-repositories"
+ccp_config_file: "config/ccp.conf"
+ccp_repos:
+  - name: fuel-ccp-debian-base
+    git_url: https://github.com/openstack/fuel-ccp-debian-base
+  - name: fuel-ccp-entrypoint
+    git_url: https://github.com/openstack/fuel-ccp-entrypoint
+  - name: fuel-ccp-etcd
+    git_url: https://github.com/openstack/fuel-ccp-etcd
+  - name: fuel-devops-portal
+    git_url: https://github.com/seecloud/fuel-devops-portal
+  - name: ceagle
+    git_url: https://github.com/seecloud/ceagle
+  - name: health
+    git_url: https://github.com/seecloud/health
+  - name: availability
+    git_url: https://github.com/seecloud/availability
+  - name: performance
+    git_url: https://github.com/seecloud/performance

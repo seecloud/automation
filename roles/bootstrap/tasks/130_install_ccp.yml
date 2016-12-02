@@ -1,0 +1,3 @@
+- name: Install CCP | Install fuel-ccp
+  shell: pip install {{ local_artifactory_dir }}/{{ ccp_path }} --no-index \
+         --find-links {{ local_artifactory_dir }}/{{ pip_packages_folder }}
