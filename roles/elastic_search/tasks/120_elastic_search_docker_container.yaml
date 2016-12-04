@@ -2,6 +2,7 @@
   service:
     name: docker-latest
     state: restarted
+  notify: Sysctl | update system configuration
 
 - name: Elasticsearch container
   debug: var=download

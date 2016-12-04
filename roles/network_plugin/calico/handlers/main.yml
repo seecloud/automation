@@ -14,6 +14,3 @@
     name: calico-node
     state: restarted
     sleep: 10
-
-- name: Sysctl | update system configuration
-  shell: sysctl --system

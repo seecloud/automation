@@ -131,4 +131,5 @@
   shell: "{{ bin_dir }}/calicoctl node bgp peer add {{ item.router_id }} as {{ item.as }}"
   with_items: peers
   when: peer_with_router|default(false) and inventory_hostname in groups['kube-node']
+  notify: Sysctl | update system configuration
 
