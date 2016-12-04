@@ -144,3 +144,8 @@ cloud_provider: generic
 # default packages to install within the cluster
 kpm_packages: []
 #  - name: kube-system/grafana
+
+# ccp deployment options
+# you can skip building/deployment of the oss images by setting next values to false
+build_oss_images: true
+deploy_oss_images: true

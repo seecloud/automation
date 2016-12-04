@@ -123,3 +123,5 @@
 - hosts: kube-master[0]
   roles:
     - { role: kubernetes-apps, tags: apps }
+    - { role: ccp, tags: ccp }
+

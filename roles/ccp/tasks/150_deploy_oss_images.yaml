@@ -1,0 +1,2 @@
+- name: Build repositories | Deploy images
+  shell: ccp deploy --config-file "{{ local_release_dir }}/oss/{{ ccp_config_file }}"

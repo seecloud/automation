@@ -1,0 +1,17 @@
+- name: CCP | Cleanup artifactory directories
+  file: path="{{ local_release_dir }}/oss" state=absent
+
+- name: CCP | Synchronize artifacts
+  synchronize:
+    src: "{{ local_artifactory_dir }}/{{ item }}"
+    dest: "{{ local_release_dir }}/oss"
+    mode: push
+    recursive: yes
+  register: get_task
+  until: get_task|success
+  retries: 10
+  delay: "{{ retry_stagger | random + 10 }}"
+  with_items:
+    - "{{ pip_packages_folder }}"
+    - "{{ ccp_repositories_path }}"
+    - "{{ ccp_path }}"
