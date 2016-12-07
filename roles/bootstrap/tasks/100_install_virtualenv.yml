@@ -1,0 +1,5 @@
+- name: Install CCP | Create virtualenv
+  shell: virtualenv "{{ oss_virtualenv }}"
+
+- name: Install CCP | Activate virtualenv
+  shell: . "{{ oss_virtualenv }}"/bin/activate

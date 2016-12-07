@@ -8,4 +8,4 @@
   debug: var=ccp_repos
 
 - name: Fetch repositories | Clone repositories
-  shell: ccp fetch --config-file "{{ playbook_dir }}/{{ ccp_config_file }}"
+  command: "{{ oss_virtualenv }}/bin/ccp fetch --config-file {{ playbook_dir }}/{{ ccp_config_file }}"

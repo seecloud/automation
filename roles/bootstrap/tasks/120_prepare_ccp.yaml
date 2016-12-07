@@ -7,7 +7,7 @@
   file: path="{{ local_artifactory_dir }}/{{ pip_packages_folder }}" state=directory
 
 - name: Install CCP | Download pip packages
-  shell: pip download {{ item }} {{ local_artifactory_dir }}/{{ ccp_path }}
+  shell: "{{ oss_virtualenv }}/bin/pip download {{ item }} {{ local_artifactory_dir }}/{{ ccp_path }}"
   args:
     chdir: "{{ local_artifactory_dir }}/{{ pip_packages_folder }}"
   with_items:
