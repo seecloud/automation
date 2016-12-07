@@ -1,0 +1,3 @@
+- name: CCP | Install fuel-ccp
+  shell: pip install {{ local_release_dir }}/oss/{{ ccp_path }} --no-index \
+         --find-links {{ local_release_dir }}/oss/{{ pip_packages_folder }}

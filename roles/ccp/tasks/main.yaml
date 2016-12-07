@@ -1,0 +1,11 @@
+- include: 110_copy_artifacts.yaml
+
+- include: 120_install_ccp.yaml
+
+- include: 130_render_ccp_configuration.yaml
+
+- include: 140_build_oss_images.yaml
+  when: build_oss_images|bool
+
+- include: 150_deploy_oss_images.yaml
+  when: build_oss_images|bool and deploy_oss_images|bool

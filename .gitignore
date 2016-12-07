@@ -1,2 +1,6 @@
 artifacts
+config
+*.tar.gz
+*.whl
+*.zip
 *.retry

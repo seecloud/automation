@@ -1,5 +1,11 @@
 ---
-#- include: test.yml
+- include: 100_upgrade_requirements.yml
 
 - include: 110_download.yml file={{ downloads[item] }}
   with_items: "{{ download_items }}"
+
+- include: 120_prepare_ccp.yaml
+
+- include: 130_install_ccp.yml artifacts_path="{{ local_artifactory_dir }}"
+
+- include: 140_fetch_ccp_repositories.yml

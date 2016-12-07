@@ -1,0 +1,7 @@
+repositories:
+  path: {{ local_artifactory_dir }}/{{ ccp_repositories_path }}
+  repos:
+  {% for repo in ccp_repos %}
+  - name: {{ repo.name }}
+      git_url: {{ repo.git_url }}
+  {% endfor %}

@@ -1,0 +1,8 @@
+- name: Update sysctl configuration
+  lineinfile:
+    dest: /etc/sysctl.conf
+    line: "{{ item.line }}"
+  with_items:
+    - { line: 'net.ipv4.ip_forward=1' }
+    - { line: 'net.bridge.bridge-nf-call-iptables=0' }
+    - { line: 'vm.max_map_count=262144' }

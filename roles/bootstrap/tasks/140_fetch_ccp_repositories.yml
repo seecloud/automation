@@ -1,0 +1,11 @@
+- name: Fetch repositories | Ensure configuration folder exist
+  file: path="{{ playbook_dir }}/{{ ccp_config_file | dirname }}" state=directory
+
+- name: Fetch repositories | Create configuration with repositories for fetch
+  template: src=ccp-repositories.conf.j2 dest="{{ playbook_dir }}/{{ ccp_config_file }}"
+
+- name: Fetch repositories | List of repositories
+  debug: var=ccp_repos
+
+- name: Fetch repositories | Clone repositories
+  shell: ccp fetch --config-file "{{ playbook_dir }}/{{ ccp_config_file }}"

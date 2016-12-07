@@ -1,0 +1,15 @@
+- name: Install CCP | Clone repository
+  shell: git clone "{{ fuel_ccp_repo }}"
+          chdir="{{ local_artifactory_dir }}"
+          creates="{{ local_artifactory_dir }}/{{ ccp_path }}"
+
+- name: Install CCP | Ensure pip packages folders exist
+  file: path="{{ local_artifactory_dir }}/{{ pip_packages_folder }}" state=directory
+
+- name: Install CCP | Download pip packages
+  shell: pip download {{ item }} {{ local_artifactory_dir }}/{{ ccp_path }}
+  args:
+    chdir: "{{ local_artifactory_dir }}/{{ pip_packages_folder }}"
+  with_items:
+    - " "
+    - "--no-binary :all:"

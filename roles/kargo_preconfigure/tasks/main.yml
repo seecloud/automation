@@ -1,4 +1,7 @@
 ---
+- name: Preconfigure | debug download
+  debug: var=download
+
 - name: Create dest directories
   file: path={{local_release_dir}}/{{download.dest|dirname}} state=directory recurse=yes
   when: "{{ download.enabled|bool and not download.container|bool }}"
@@ -31,7 +34,7 @@
     path: "{{local_release_dir}}/{{download.dest}}"
     owner: "{{ download.owner|default(omit) }}"
     mode: "{{ download.mode|default(omit) }}"
-  when: "{{ download.enabled|bool and not download.container|bool and (download.unarchive is not defined or download.unarchive == False) }}"
+  when: "{{ download.enabled|bool and not download.container|bool and (download.unarchive is not defined or not download.unarchive|bool ) }}"
 
 #NOTE(bogdando) this brings no docker-py deps for nodes
 - name: Pull containers from registry

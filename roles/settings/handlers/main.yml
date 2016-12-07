@@ -32,3 +32,6 @@
   retries: 10
   delay: 5
   until: docker_ready.rc == 0
+
+- name: Sysctl | update system configuration
+  shell: sysctl --system
