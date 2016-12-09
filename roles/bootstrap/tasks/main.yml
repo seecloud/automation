@@ -1,5 +1,7 @@
 ---
-- include: 100_upgrade_requirements.yml
+- include: 100_install_virtualenv.yml
+
+- include: 105_upgrade_requirements.yml
 
 - include: 110_download.yml file={{ downloads[item] }}
   with_items: "{{ download_items }}"

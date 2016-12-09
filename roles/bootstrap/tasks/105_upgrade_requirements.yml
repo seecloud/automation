@@ -1,5 +1,5 @@
 - name: Boostrap | Upgrade pip requirements
-  shell: pip install --upgrade {{ item }} 
+  shell: "{{ oss_virtualenv }}/bin/pip install --upgrade {{ item }}"
   with_items:
     - pip
     - setuptools
