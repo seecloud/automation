@@ -32,27 +32,23 @@
         elastic_search_docker_image: 'registry:5000/elasticsearch'
 # Keepalived
 # Virtual IP
-        docker_registry_virtual_ip:  '172.18.128.125'
         docker_registry_mount_point: '/opt/docker_registry_mount_point'
 
 
 #
   roles:
       - role: common
-        docker_registry_ip: "{{ docker_registry_virtual_ip }}"
         docker_registry_name: "{{ registry_name }}"
 #
 - hosts: keepalived_nodes[0]
   roles:
      - role: keepalived
        keepalived_state: "master"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
 #
 - hosts: keepalived_nodes:!keepalived_nodes[0]
   roles:
      - role: keepalived
        keepalived_state: "backup"
-       virtual_ip: "{{ docker_registry_virtual_ip }}"
 #
 #
 - hosts: glusterfs_nodes
@@ -81,7 +77,6 @@
   roles:
     - role: docker_registry
       registry_role: "client"
-      docker_registry_ip: "{{ docker_registry_virtual_ip }}"
 
 #
 - hosts: elasticsearch_nodes

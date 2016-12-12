@@ -1,0 +1,14 @@
+- set_fact:
+    docker_registry_virtual_ip: "{{ hostvars[groups['keepalived_nodes'][0]]['keepalived_ip'] }}"
+    docker_registry_ip: "{{ hostvars[groups['keepalived_nodes'][0]]['keepalived_ip'] }}"
+    virtual_ip: "{{ hostvars[groups['keepalived_nodes'][0]]['keepalived_ip'] }}"
+
+- name: Docker registry virtual IP
+  debug: msg="Docker registry IP is {{ virtual_ip }}"
+
+
+- name: "Generate /etc/hosts file"
+  template: "src=hosts.j2 dest='/etc/hosts' owner=root group=root mode=0644"
+
+- name: Update hosts with registry address
+  lineinfile: dest=/etc/hosts regexp='{{ docker_registry_ip }}' line='{{ docker_registry_ip }} {{ docker_registry_name }}'

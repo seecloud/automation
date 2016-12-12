@@ -3,9 +3,9 @@ global_defs {
 }
 vrrp_script {{ keepalived_vrrp_check }} {
         script "pidof {{ keepalived_check_process }}"
-        interval 2
+        interval 5
         weight 2
-        fail 2
+        fail 5
         rise 2
 }
 vrrp_instance docker_registry {
@@ -28,5 +28,4 @@ vrrp_instance docker_registry {
         track_script {
             {{ keepalived_vrrp_check }}
         }
-    notify_master "{{ keepalived_notify_script }} MASTER"
 }
