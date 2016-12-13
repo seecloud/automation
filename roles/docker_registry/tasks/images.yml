@@ -14,7 +14,7 @@
   file: path=/opt/docker_images state=directory # gluster volume ???
 
 - name: Upload Images
-  copy:
+  synchronize:
     src: "{{ item }}"
     dest: "/opt/docker_images/{{ item|basename }}"
   with_items: '{{ docker_images.stdout_lines | default([]) }}'
