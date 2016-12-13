@@ -1,0 +1,5 @@
+- name: CCP | Set context
+  shell: "{{ bin_dir }}/kubectl config set-context {{ oss_namespace }} --namespace {{ oss_namespace }}"
+
+- name: CCP | Use context
+  shell: "{{ bin_dir }}/kubectl config use-context {{ oss_namespace }}"

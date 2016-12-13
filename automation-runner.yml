@@ -78,21 +78,6 @@
     - role: docker_registry
       registry_role: "client"
 
-#
-- hosts: elasticsearch_nodes
-  roles:
-    - role: glusterfs_client
-      glusterfs_mount_point:          "{{ elastic_search_backup_dir }}"
-      glusterfs_volume_name:          "{{ elastic_search_volume_name }}"
-      glusterfs_mount_point_user_id:  "{{ elastic_search_user_id }}"
-      glusterfs_mount_point_group_id: "{{ elastic_search_group_id }}"
-    - role: elastic_search
-      es_data_dir:      "{{ elastic_search_data_dir }}"
-      es_config_dir:    "{{ elastic_search_config_dir }}"
-      es_log_dir:       "{{ elastic_search_log_dir }}"
-      es_backup_dir:    "{{ elastic_search_backup_dir }}"
-      es_docker_image:  "{{ elastic_search_docker_image }}"
-
 
 - hosts: etcd:!k8s-cluster
   roles:
@@ -118,5 +103,22 @@
 - hosts: kube-master[0]
   roles:
     - { role: kubernetes-apps, tags: apps }
-    - { role: ccp, tags: ccp }
 
+#
+- hosts: elasticsearch_nodes
+  roles:
+    - role: glusterfs_client
+      glusterfs_mount_point:          "{{ elastic_search_backup_dir }}"
+      glusterfs_volume_name:          "{{ elastic_search_volume_name }}"
+      glusterfs_mount_point_user_id:  "{{ elastic_search_user_id }}"
+      glusterfs_mount_point_group_id: "{{ elastic_search_group_id }}"
+    - role: elastic_search
+      es_data_dir:      "{{ elastic_search_data_dir }}"
+      es_config_dir:    "{{ elastic_search_config_dir }}"
+      es_log_dir:       "{{ elastic_search_log_dir }}"
+      es_backup_dir:    "{{ elastic_search_backup_dir }}"
+      es_docker_image:  "{{ elastic_search_docker_image }}"
+
+- hosts: kube-master[0]
+  roles:
+    - { role: ccp, tags: ccp }

@@ -14,7 +14,7 @@ ExecStart={{ docker_bin_dir | default("/usr/bin") }}/docker run --restart=always
 --stop-signal=SIGKILL \
 -v /usr/share/ca-certificates/:/etc/ssl/certs:ro \
 --name={{ etcd_proxy_member_name | default("etcd-proxy") }} \
-{{ etcd_image_repo }}:{{ etcd_image_tag }} \
+{{ registry|default(None) }}{{ etcd_image_repo }}:{{ etcd_image_tag }} \
 {% if etcd_after_v3 %}
 {{ etcd_container_bin_dir }}etcd
 {% endif %}

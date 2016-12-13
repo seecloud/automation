@@ -4,5 +4,5 @@
 -v /usr/bin/docker:/usr/bin/docker \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v /var/run/calico:/var/run/calico \
-{{ calicoctl_image_repo }}:{{ calicoctl_image_tag}} \
+{{ registry|default(None) }}{{ calicoctl_image_repo }}:{{ calicoctl_image_tag}} \
 $@
