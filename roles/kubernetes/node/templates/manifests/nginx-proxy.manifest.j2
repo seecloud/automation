@@ -7,7 +7,7 @@ spec:
   hostNetwork: true
   containers:
   - name: nginx-proxy
-    image: {{ nginx_image_repo }}:{{ nginx_image_tag }}
+    image: {{ registry|default(None) }}{{ nginx_image_repo }}:{{ nginx_image_tag }}
     securityContext:
       privileged: true
     volumeMounts:

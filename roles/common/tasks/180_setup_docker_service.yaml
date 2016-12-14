@@ -1,3 +1,12 @@
+- name: Create alias for docker service
+  file: src=/usr/lib/systemd/system/docker-latest.service dest=/usr/lib/systemd/system/docker.service state=link
+
+- name: Create alias for docker storage service
+  file: src=/usr/lib/systemd/system/docker-latest-storage-setup.service dest=/usr/lib/systemd/system/docker-storage-setup.service state=link
+
+- name : Docker | reload systemd
+  shell: systemctl daemon-reload
+
 - name: Ensure docker runner
   service:
     name: docker

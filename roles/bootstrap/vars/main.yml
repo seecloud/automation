@@ -7,7 +7,9 @@ items:
   - calico_cni_plugin_ipam
   - calico_node
   - calicoctl
-  - flannel_server_helper
-  - flannel
-  - weave
+  - dnsmasq
+  - kubednsmasq
+  - kubedns
+  - nginx
+  - exechealthz
 download_items: "{{ items }}"

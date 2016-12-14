@@ -1,0 +1,15 @@
+- set_fact:
+    re: "{{ ansible_default_ipv4.broadcast }}"
+    rs: "{{ ansible_default_ipv4.gateway }}"
+
+- name: Common | Checking network for free IP address for Virtual IP
+  shell: |
+       ping -c 2 {{ re.split('.')[0] }}.{{ re.split('.')[1] }}.{{ re.split('.')[2] }}.{{re.split('.')[3]|int | random(rs.split('.')[3]|int ) }}
+  register: result
+  until: result|failed
+  retries: 10
+  failed_when: False
+
+- name: Set docker registry virtual ip
+  set_fact: 
+    keepalived_ip: "{{ result.stdout_lines[0].split(' ')[1] }}"

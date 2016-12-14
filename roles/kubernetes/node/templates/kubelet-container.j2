@@ -9,7 +9,7 @@
 -v /var/lib/docker:/var/lib/docker \
 -v /var/run:/var/run \
 -v /var/lib/kubelet:/var/lib/kubelet \
-{{ hyperkube_image_repo }}:{{ hyperkube_image_tag}} \
+{{ registry|default(None) }}{{ hyperkube_image_repo }}:{{ hyperkube_image_tag}} \
 nsenter --target=1 --mount --wd=. -- \
 ./hyperkube kubelet \
 $@

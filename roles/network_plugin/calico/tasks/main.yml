@@ -23,7 +23,7 @@
   notify: restart calico-node
 
 - name: Calico | Copy cni plugins from hyperkube
-  command: "/usr/bin/docker run --rm -v /opt/cni/bin:/cnibindir {{ hyperkube_image_repo }}:{{ hyperkube_image_tag }} /usr/bin/rsync -a /opt/cni/bin/ /cnibindir/"
+  command: "/usr/bin/docker run --rm -v /opt/cni/bin:/cnibindir {{ registry|default(None) }}{{ hyperkube_image_repo }}:{{ hyperkube_image_tag }} /usr/bin/rsync -a /opt/cni/bin/ /cnibindir/"
   register: cni_task_result
   until: cni_task_result.rc == 0
   retries: 4

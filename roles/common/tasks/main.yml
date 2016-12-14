@@ -1,8 +1,11 @@
 ---
 # tasks file for common
-  - include: 000_debug.yaml
+  - include: 100_find_registry_ip.yml
+    delegate_to: "{{ groups.keepalived_nodes[0]}}"
+    when: keepalived_ip is not defined
+    run_once: true
 
-  - include: 100_build_hosts_file.yaml
+  - include: 105_build_hosts_file.yaml
 
   - include: 110_update_resolv_conf.yaml
 
