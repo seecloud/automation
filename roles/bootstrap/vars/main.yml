@@ -3,13 +3,15 @@ items:
   - etcd
   - hyperkube
   - elasticsearch
-  - calico_cni_plugin
-  - calico_cni_plugin_ipam
-  - calico_node
   - calicoctl
+  - calico_node
+  - calico_cni
+  - calico_policy
+  - pod_infra
   - dnsmasq
   - kubednsmasq
   - kubedns
   - nginx
   - exechealthz
+  - testbox
 download_items: "{{ items }}"

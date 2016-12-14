@@ -3,4 +3,36 @@ dependencies:
   - role: settings
   - role: kargo_preconfigure
     file: "{{ downloads.hyperkube }}"
+    tags: [download, hyperkube, kubelet, network, canal, calico, weave, kube-controller-manager, kube-scheduler, kube-apiserver, kube-proxy, kubectl]
+  - role: kargo_preconfigure
+    file: "{{ downloads.pod_infra }}"
+    tags: [download, kubelet]
   - role: kubernetes/secrets
+    tags: k8s-secrets
+  - role: kargo_preconfigure
+    file: "{{ downloads.nginx }}"
+    tags: [download, nginx]
+  - role: kargo_preconfigure
+    file: "{{ downloads.testbox }}"
+    tags: download
+  - role: kargo_preconfigure
+    file: "{{ downloads.netcheck_server }}"
+    when: deploy_netchecker
+    tags: [download, netchecker]
+  - role: kargo_preconfigure
+    file: "{{ downloads.netcheck_agent }}"
+    when: deploy_netchecker
+    tags: [download, netchecker]
+  - role: kargo_preconfigure
+    file: "{{ downloads.netcheck_kubectl }}"
+    when: deploy_netchecker
+    tags: [download, netchecker]
+  - role: kargo_preconfigure
+    file: "{{ downloads.kubednsmasq }}"
+    tags: [download, dnsmasq]
+  - role: kargo_preconfigure
+    file: "{{ downloads.kubedns }}"
+    tags: [download, dnsmasq]
+  - role: kargo_preconfigure
+    file: "{{ downloads.exechealthz }}"
+    tags: [download, dnsmasq]

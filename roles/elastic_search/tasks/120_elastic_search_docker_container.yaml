@@ -1,6 +1,6 @@
 - name: Elasticsearch | reload docker
   service:
-    name: docker-latest
+    name: docker
     state: restarted
   notify: Sysctl | update system configuration
 
@@ -11,8 +11,7 @@
   docker:
     name: elasticsearch
     image: "{{ download.repo }}:{{ download.tag }}"
-#    state: started
-    state: reloaded
+    state: started
     pull: missing
     net: bridge
     ports:
