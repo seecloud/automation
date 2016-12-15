@@ -15,6 +15,7 @@ kubernetes:
 images:
   namespace: {{ oss_namespace }}
 repositories:
+  clone: False
   path: {{ local_release_dir }}/oss/{{ ccp_repositories_path }}
   repos:
 {% for repo in ccp_repos %}
