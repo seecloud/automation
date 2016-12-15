@@ -198,5 +198,3 @@ ccp_repos:
     git_url: https://github.com/seecloud/health
   - name: availability
     git_url: https://github.com/seecloud/availability
-  - name: performance
-    git_url: https://github.com/seecloud/performance
