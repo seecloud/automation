@@ -16,3 +16,4 @@ registry_role: "undefined"
 #docker
 docker_registry_tar: "/opt/docker_private_registry/roles/docker_registry/files/registry.tar"
 openssl_tmp_config: "/tmp/openssl.cnf"
+docker_images_remote_path: "/opt/docker_images"

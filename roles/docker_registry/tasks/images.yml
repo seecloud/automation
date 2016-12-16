@@ -11,13 +11,28 @@
   debug: var=docker_images.stdout_lines
 
 - name: Ensure docker images dir exists
-  file: path=/opt/docker_images state=directory # gluster volume ???
+  file: path="{{ docker_images_remote_path }}" state=directory 
+
+- name: Check if docker images exist on remote host
+  stat:
+    path: "{{ docker_images_remote_path }}/{{ item|basename }}"
+  register: remote_docker_tars
+  with_items: '{{ docker_images.stdout_lines | default([]) }}'
+
+- name: Create dictionary with existing images
+  set_fact:
+    existing_images: "{{ existing_images|default({}) | combine( {item.item|basename: item.stat.exists} ) }}"
+  with_items: "{{ remote_docker_tars.results }}"
+
+- name: Debug
+  debug: var=existing_images
 
 - name: Upload Images
   synchronize:
     src: "{{ item }}"
-    dest: "/opt/docker_images/{{ item|basename }}"
+    dest: "{{ docker_images_remote_path }}/{{ item|basename }}"
   with_items: '{{ docker_images.stdout_lines | default([]) }}'
+  when: "not {{ existing_images[item|basename]}}"
 
 - name: Load docker images from tars
   shell: docker load < "/opt/docker_images/{{ item|basename }}"
