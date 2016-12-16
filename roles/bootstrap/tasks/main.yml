@@ -1,4 +1,7 @@
 ---
+- include: 000_cleanup_artifacts.yml
+  when: force_download_artifacts
+
 - include: 100_install_virtualenv.yml
 
 - include: 105_upgrade_requirements.yml
