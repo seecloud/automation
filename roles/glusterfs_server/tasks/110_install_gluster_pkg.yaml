@@ -1,19 +1,5 @@
-- name: Update apt cache
-  apt: update_cache=yes
-  sudo: yes
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-
-- name: Install Gluster
-  apt: name={{ item }}
-  with_items:
-    -  glusterfs-server
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-
-
-- name: Install Gluster
-  package: name={{ item }}
+- name: Check if Gluster installed
+  shell: rpm -qa | grep -q {{ item }}
   with_items:
     - glusterfs
     - glusterfs-server
@@ -21,10 +7,9 @@
     - glusterfs-cli
     - glusterfs-api
     - glusterfs-fuse
-  when: ansible_distribution == 'CentOS'
-
-
-
+  register: package_installed
+  failed_when: package_installed.rc != 0
+  when: ansible_os_family == "RedHat"
 
 - name: Disable Firewall
   service:
