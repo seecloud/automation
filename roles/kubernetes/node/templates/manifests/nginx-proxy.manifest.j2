@@ -2,12 +2,15 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx-proxy
-  namespace: kube-system
+  namespace: {{system_namespace}}
+  labels:
+    k8s-app: kube-nginx
 spec:
   hostNetwork: true
   containers:
   - name: nginx-proxy
     image: {{ registry|default(None) }}{{ nginx_image_repo }}:{{ nginx_image_tag }}
+    imagePullPolicy: {{ k8s_image_pull_policy }}
     securityContext:
       privileged: true
     volumeMounts:

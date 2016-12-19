@@ -1,2 +1,6 @@
 dependencies:
   - role: settings
+  - role: kargo_preconfigure
+    file: "{{ downloads.dnsmasq }}"
+    when: not skip_dnsmasq|default(false) and download_localhost|default(false)
+    tags: [download, dnsmasq]

@@ -3,17 +3,20 @@ kind: Pod
 metadata:
   name: kube-scheduler
   namespace: kube-system
+  labels:
+    k8s-app: kube-scheduler
 spec:
   hostNetwork: true
   containers:
   - name: kube-scheduler
     image: {{ registry|default(None) }}{{ hyperkube_image_repo }}:{{ hyperkube_image_tag }}
+    imagePullPolicy: {{ k8s_image_pull_policy }}
     command:
     - /hyperkube
     - scheduler
     - --leader-elect=true
     - --master={{ kube_apiserver_endpoint }}
-    - --v={{ kube_log_level | default('2') }}
+    - --v={{ kube_log_level }}
     livenessProbe:
       httpGet:
         host: 127.0.0.1

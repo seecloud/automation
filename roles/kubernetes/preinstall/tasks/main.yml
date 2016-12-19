@@ -3,18 +3,22 @@
   set_fact:
     bin_dir: "/opt/bin"
   when: ansible_os_family == "CoreOS"
+  tags: facts
 
-
-- name: 'GIT | Install script for collecting git info'
-  template:
-    src: "{{ role_path }}/gen-gitinfos.sh"
-    dest: "{{ bin_dir }}/gen-gitinfos.sh"
-    mode: a+rwx
+- name: check bin dir exists
+  file:
+    path: "{{bin_dir}}"
+    state: directory
+    owner: root
+  become: true
+  tags: bootstrap-os
 
 - include: gitinfos.yml
   when: run_gitinfos
+  tags: facts
 
 - include: set_facts.yml
+  tags: facts
 
 - name: gather os specific variables
   include_vars: "{{ item }}"
@@ -29,6 +33,7 @@
       paths:
       - ../vars
       skip: true
+  tags: facts
 
 - name: Create kubernetes config directory
   file:
@@ -36,6 +41,7 @@
     state: directory
     owner: kube
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
+  tags: [kubelet, k8s-secrets, kube-controller-manager, kube-apiserver, bootstrap-os, apps, network, master, node]
 
 - name: Create kubernetes script directory
   file:
@@ -43,6 +49,7 @@
     state: directory
     owner: kube
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
+  tags: [k8s-secrets, bootstrap-os]
 
 - name: Create kubernetes manifests directory
   file:
@@ -50,6 +57,7 @@
     state: directory
     owner: kube
   when: "{{ inventory_hostname in groups['k8s-cluster'] }}"
+  tags: [kubelet, bootstrap-os, master, node]
 
 - name: Create kubernetes logs directory
   file:
@@ -57,14 +65,33 @@
     state: directory
     owner: kube
   when: ansible_service_mgr in ["sysvinit","upstart"] and "{{ inventory_hostname in groups['k8s-cluster'] }}"
+  tags: [bootstrap-os, master, node]
 
 - name: check cloud_provider value
   fail:
-    msg: "If set the 'cloud_provider' var must be set either to 'generic', 'gce', 'aws' or 'openstack'"
-  when: cloud_provider is defined and cloud_provider not in ['generic', 'gce', 'aws', 'openstack']
+    msg: "If set the 'cloud_provider' var must be set either to 'generic', 'gce', 'aws', 'azure' or 'openstack'"
+  when: cloud_provider is defined and cloud_provider not in ['generic', 'gce', 'aws', 'openstack', 'azure']
+  tags: [cloud-provider, facts]
 
 - include: openstack-credential-check.yml
   when: cloud_provider is defined and cloud_provider == 'openstack'
+  tags: [cloud-provider, openstack, facts]
+
+- include: azure-credential-check.yml
+  when: cloud_provider is defined and cloud_provider == 'azure'
+  tags: [cloud-provider, azure, facts]
+
+- name: Fix ipv4 forward rule in GCE security policy
+  lineinfile:
+    dest: /etc/sysctl.d/99-sysctl.conf
+    regexp: '^net.ipv4.ip_forward='
+    line: 'net.ipv4.ip_forward=1'
+    state: present
+    create: yes
+    backup: yes
+    validate: 'sysctl -f %s'
+  when: cloud_provider is defined and cloud_provider == 'gce'
+  tags: [cloud-provider, gce, bootstrap-os]
 
 - name: Create cni directories
   file:
@@ -74,18 +101,8 @@
   with_items:
     - "/etc/cni/net.d"
     - "/opt/cni/bin"
-  when: kube_network_plugin in ["calico", "weave"] and "{{ inventory_hostname in groups['k8s-cluster'] }}"
-
-- name: Install latest version of python-apt for Debian distribs
-  apt: name=python-apt state=latest update_cache=yes cache_valid_time=3600
-  when: ansible_os_family == "Debian"
-
-- name: Install python-dnf for latest RedHat versions
-  command: dnf install -y python-dnf yum
-  when: ansible_distribution == "Fedora" and
-        ansible_distribution_major_version > 21
-  changed_when: False
-
+  when: kube_network_plugin in ["calico", "weave", "canal"] and "{{ inventory_hostname in groups['k8s-cluster'] }}"
+  tags: [network, calico, weave, canal, bootstrap-os]
 
 - name: Check packages requirements
   shell: rpm -qa | grep -q {{ item }}
@@ -101,12 +118,14 @@
     state: present
     backup: yes
   when: disable_ipv6_dns and ansible_os_family != "CoreOS"
+  tags: bootstrap-os
 
 # Todo : selinux configuration
 - name: Set selinux policy to permissive
   selinux: policy=targeted state=permissive
   when: ansible_os_family == "RedHat"
   changed_when: False
+  tags: bootstrap-os
 
 - name: Write openstack cloud-config
   template:
@@ -115,5 +134,20 @@
     group: "{{ kube_cert_group }}"
     mode: 0640
   when: cloud_provider is defined and cloud_provider == "openstack"
+  tags: [cloud-provider, openstack]
+
+- name: Write azure cloud-config
+  template:
+    src: azure-cloud-config.j2
+    dest: "{{ kube_config_dir }}/cloud_config"
+    group: "{{ kube_cert_group }}"
+    mode: 0640
+  when: cloud_provider is defined and cloud_provider == "azure"
+  tags: [cloud-provider, azure]
 
 - include: etchosts.yml
+  tags: [bootstrap-os, etchosts]
+
+- include: resolvconf.yml
+  tags: [bootstrap-os, resolvconf]
+

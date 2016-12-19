@@ -10,3 +10,19 @@
 # Max of 2 is allowed here (a 1 is reserved for the dns_server)
 #nameservers:
 #  - 127.0.0.1
+
+# Versions
+dnsmasq_version: 2.72
+
+# Images
+dnsmasq_image_repo: "andyshinn/dnsmasq"
+dnsmasq_image_tag: "{{ dnsmasq_version }}"
+
+# Skip dnsmasq setup
+skip_dnsmasq: false
+
+# Limits for dnsmasq/kubedns apps
+dns_cpu_limit: 100m
+dns_memory_limit: 170Mi
+dns_cpu_requests: 70m
+dns_memory_requests: 70Mi

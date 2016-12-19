@@ -2,12 +2,15 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: kube-controller-manager
-  namespace: kube-system
+  namespace: {{system_namespace}}
+  labels:
+    k8s-app: kube-controller
 spec:
   hostNetwork: true
   containers:
   - name: kube-controller-manager
     image: {{ registry|default(None) }}{{ hyperkube_image_repo }}:{{ hyperkube_image_tag }}
+    imagePullPolicy: {{ k8s_image_pull_policy }}
     command:
     - /hyperkube
     - controller-manager
@@ -15,9 +18,11 @@ spec:
     - --leader-elect=true
     - --service-account-private-key-file={{ kube_cert_dir }}/apiserver-key.pem
     - --root-ca-file={{ kube_cert_dir }}/ca.pem
+    - --cluster-signing-cert-file={{ kube_cert_dir }}/ca.pem
+    - --cluster-signing-key-file={{ kube_cert_dir }}/ca-key.pem
     - --enable-hostpath-provisioner={{ kube_hostpath_dynamic_provisioner }}
-    - --v={{ kube_log_level | default('2') }}
-{% if cloud_provider is defined and cloud_provider == "openstack" %}
+    - --v={{ kube_log_level }}
+{% if cloud_provider is defined and cloud_provider in ["openstack", "azure"] %}
     - --cloud-provider={{cloud_provider}}
     - --cloud-config={{ kube_config_dir }}/cloud_config
 {% elif cloud_provider is defined and cloud_provider == "aws" %}
@@ -34,7 +39,7 @@ spec:
     - mountPath: {{ kube_cert_dir }}
       name: ssl-certs-kubernetes
       readOnly: true
-{% if cloud_provider is defined and cloud_provider == "openstack" %}
+{% if cloud_provider is defined and cloud_provider in ["openstack", "azure"] %}
     - mountPath: {{ kube_config_dir }}/cloud_config
       name: cloudconfig
       readOnly: true
@@ -43,7 +48,7 @@ spec:
   - hostPath:
       path: {{ kube_cert_dir }}
     name: ssl-certs-kubernetes
-{% if cloud_provider is defined and cloud_provider == "openstack" %}
+{% if cloud_provider is defined and cloud_provider in ["openstack", "azure"] %}
   - hostPath:
       path: {{ kube_config_dir }}/cloud_config
     name: cloudconfig

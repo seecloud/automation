@@ -79,31 +79,6 @@
       registry_role: "client"
 
 
-- hosts: etcd:!k8s-cluster
-  roles:
-    - { role: kubernetes/preinstall, tags: preinstall }
-    - { role: etcd, tags: etcd }
-
-- hosts: k8s-cluster
-  roles:
-    - { role: kubernetes/preinstall, tags: preinstall }
-    - { role: etcd, tags: etcd }
-    - { role: kubernetes/node, tags: node }
-    - { role: network_plugin, tags: network, kube_network_plugin: calico }
-
-- hosts: kube-master
-  roles:
-    - { role: kubernetes/preinstall, tags: preinstall }
-    - { role: kubernetes/master, tags: master }
-
-- hosts: k8s-cluster
-  roles:
-    - { role: dnsmasq, tags: dnsmasq }
-
-- hosts: kube-master[0]
-  roles:
-    - { role: kubernetes-apps, tags: apps }
-
 #
 - hosts: elasticsearch_nodes
   roles:
@@ -119,6 +94,41 @@
       es_backup_dir:    "{{ elastic_search_backup_dir }}"
       es_docker_image:  "{{ elastic_search_docker_image }}"
 
+- hosts: all:!network-storage
+  any_errors_fatal: true
+  roles:
+    - { role: kubernetes/preinstall, tags: preinstall }
+
+- hosts: etcd:!k8s-cluster
+  any_errors_fatal: true
+  roles:
+    - { role: etcd, tags: etcd }
+
+- hosts: k8s-cluster
+  any_errors_fatal: true
+  roles:
+    - { role: etcd, tags: etcd }
+    - { role: kubernetes/node, tags: node }
+    - { role: network_plugin, tags: network, kube_network_plugin: calico }
+
+- hosts: kube-master
+  any_errors_fatal: true
+  roles:
+    - { role: kubernetes/master, tags: master }
+    - { role: kubernetes-apps/lib, tags: apps }
+
+- hosts: k8s-cluster
+  any_errors_fatal: true
+  roles:
+    - { role: dnsmasq, tags: dnsmasq }
+    - { role: kubernetes/preinstall, tags: resolvconf }
+
 - hosts: kube-master[0]
+  any_errors_fatal: true
+  roles:
+    - { role: kubernetes-apps/lib, tags: apps }
+    - { role: kubernetes-apps, tags: apps }
+
+- hosts: kube-master[1]
   roles:
     - { role: ccp, tags: ccp }

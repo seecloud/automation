@@ -4,11 +4,36 @@ bootstrap_os: none
 # Directory where the binaries will be installed
 bin_dir: /usr/local/bin
 
+# Kubernetes configuration dirs and system namespace.
+# Those are where all the additional config stuff goes
+# the kubernetes normally puts in /srv/kubernets.
+# This puts them in a sane location and namespace.
+# Editting those values will almost surely break something.
+kube_config_dir: /etc/kubernetes
+kube_script_dir: "{{ bin_dir }}/kubernetes-scripts"
+kube_manifest_dir: "{{ kube_config_dir }}/manifests"
+system_namespace: kube-system
+
+# Logging directory (sysvinit systems)
+kube_log_dir: "/var/log/kubernetes"
+
+# This is where all the cert scripts and certs will be located
+kube_cert_dir: "{{ kube_config_dir }}/ssl"
+
+# This is where all of the bearer tokens will be stored
+kube_token_dir: "{{ kube_config_dir }}/tokens"
+
+# This is where to save basic auth file
+kube_users_dir: "{{ kube_config_dir }}/users"
+
+## Change this to use another Kubernetes version, e.g. a current beta release
+kube_version: v1.4.6
+
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
 local_artifactory_dir: "{{ playbook_dir }}/artifacts"
 container_destination_dir: "{{ playbook_dir }}//artifacts/containers"
-local_release_dir: /tmp
+local_release_dir: "/tmp"
 # Random shifts for retrying failed ops like pushing/downloading
 retry_stagger: 5
 
@@ -23,6 +48,11 @@ kube_cert_group: kube-cert
 # Cluster Loglevel configuration
 kube_log_level: 2
 
+# Kubernetes 1.5 added a new flag to the apiserver to disable anonymous auth. In previos versions, anonymous auth was
+# not implemented. As the new flag defaults to true, we have to explicetely disable it. Change this line if you want the
+# 1.5 default behavior. The flag is actually only added if the used kubernetes version is >= 1.5
+kube_api_anonymous_auth: false
+
 # Users to create for basic auth in Kubernetes API via HTTP
 kube_api_pwd: "changeme"
 kube_users:
@@ -35,8 +65,10 @@ kube_users:
 
 # Kubernetes cluster name, also will be used as DNS domain
 cluster_name: cluster.local
-# Subdomains of DNS domain to be resolved via /etc/resolv.conf
-ndots: 5
+# Subdomains of DNS domain to be resolved via /etc/resolv.conf for hostnet pods
+ndots: 2
+# Deploy netchecker app to verify DNS resolve as an HTTP service
+deploy_netchecker: false
 
 # For some environments, each node has a pubilcally accessible
 # address and an address it should bind services to.  These are
@@ -64,14 +96,14 @@ ndots: 5
 # Enable multiaccess to configure clients to access all of the etcd members directly
 # as the "http://hostX:port, http://hostY:port, ..." and ignore the proxy loadbalancers.
 # This may be the case if clients support and loadbalance multiple etcd servers  natively.
-etcd_multiaccess: false
+etcd_multiaccess: true
 
 # Assume there are no internal loadbalancers for apiservers exist and listen on
 # kube_apiserver_port (default 443)
 loadbalancer_apiserver_localhost: true
 
 # Choose network plugin (calico, weave or flannel)
-kube_network_plugin: flannel
+kube_network_plugin: calico
 
 # Kubernetes internal network for services, unused block of space.
 kube_service_addresses: 10.233.0.0/18
@@ -135,11 +167,21 @@ cloud_provider: generic
 # https_proxy: ""
 # no_proxy: ""
 
+# Path used to store Docker data
+docker_daemon_graph: "/var/lib/docker"
+
 ## A string of extra options to pass to the docker daemon.
 ## This string should be exactly as you wish it to appear.
 ## An obvious use case is allowing insecure-registry access
 ## to self hosted registries like so:
-#docker_options: "--insecure-registry={{ kube_service_addresses }}"
+#docker_options: "--insecure-registry={{ kube_service_addresses }} --graph={{ docker_daemon_graph }}"
+
+## Uncomment this if you want to force overlay/overlay2 as docker storage driver
+## Please note that overlay2 is only supported on newer kernels
+#docker_storage_options: -s overlay2
+
+# K8s image pull policy (imagePullPolicy)
+k8s_image_pull_policy: IfNotPresent
 
 # default packages to install within the cluster
 kpm_packages: []
