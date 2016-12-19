@@ -1,5 +1,5 @@
 - name: CCP | Ensure configuration folder exist
-  file: path="{{ local_release_dir }}/oss/{{ ccp_config_file | dirname }}" state=directory
+  file: path="{{ ccp_release_dir }}/{{ ccp_config_file | dirname }}" state=directory
 
 - name: CCP | Create build configuration
-  template: src=ccp.conf.j2 dest="{{ local_release_dir }}/oss/{{ ccp_config_file }}"
+  template: src=ccp.conf.j2 dest="{{ ccp_release_dir }}/{{ ccp_config_file }}"

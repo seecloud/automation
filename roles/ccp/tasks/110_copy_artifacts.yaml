@@ -1,10 +1,13 @@
 - name: CCP | Cleanup artifactory directories
-  file: path="{{ local_release_dir }}/oss" state=absent
+  file: path="{{ ccp_release_dir }}" state=absent
+
+- name: CCP | Cleanup artifactory directories
+  file: path="{{ ccp_release_dir }}" state=directory
 
 - name: CCP | Synchronize artifacts
   synchronize:
     src: "{{ local_artifactory_dir }}/{{ item }}"
-    dest: "{{ local_release_dir }}/oss"
+    dest: "{{ ccp_release_dir }}"
     mode: push
     recursive: yes
   register: get_task

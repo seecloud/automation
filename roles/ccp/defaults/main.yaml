@@ -1,2 +1,2 @@
----
-oss_namespace: oss
+ccp_release_dir: "/opt/oss"
+force_sync_ccp_artifacts: True

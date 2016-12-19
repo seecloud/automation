@@ -1,0 +1,16 @@
+- name: Save CCP base images
+  shell: "docker save {{ ccp_namespace }}/{{ item }} > \
+         {{container_destination_dir}}/{{ ccp_namespace }}_{{ item }}.tar"
+  with_items:
+    - base
+    - base-tools
+
+- name: CCP | Get list with builded oss images
+  shell: "docker images | grep {{ ccp_namespace }} | awk '{print $1\":\"$2}'"
+  register: oss_images_info
+
+
+- name: CCP | Save ccp container images
+  shell: docker save "{{ item.split(':')[0] }}:{{ item.split(':')[1] }}" > \
+         "{{container_destination_dir}}/{{item.split(':')[0]|regex_replace('/|\0|:', '_')}}:{{item.split(':')[1]|regex_replace('/|\0|:', '_')}}.tar"
+  with_items: "{{ oss_images_info.stdout_lines | default([]) }}"

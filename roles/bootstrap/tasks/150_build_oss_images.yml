@@ -1,0 +1,2 @@
+- name: CCP | Build images
+  shell: "{{ oss_virtualenv }}/bin/ccp build --config-file {{ playbook_dir }}/{{ ccp_config_file }}"

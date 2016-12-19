@@ -1,0 +1,2 @@
+- name: Create dest directory for saved/loaded container images
+  file: path="{{local_artifactory_dir}}/containers" state=directory recurse=yes

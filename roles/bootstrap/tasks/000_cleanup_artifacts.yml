@@ -1,0 +1,9 @@
+- name: Clean artifacts path
+  file:
+    state: absent
+    path: "{{ artifacts_path }}/"
+
+- name: Remove ccp virtualenv
+  file:
+    state: absent
+    path: "{{ oss_virtualenv }}/"

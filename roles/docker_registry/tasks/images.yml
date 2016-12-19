@@ -35,7 +35,7 @@
   when: "not {{ existing_images[item|basename]}}"
 
 - name: Load docker images from tars
-  shell: docker load < "/opt/docker_images/{{ item|basename }}"
+  shell: docker load -i "/opt/docker_images/{{ item|basename }}"
   register: loaded_images
   with_items: '{{ docker_images.stdout_lines | default([]) }}'
 

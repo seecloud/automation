@@ -26,3 +26,5 @@
   - include: 180_setup_docker_service.yaml
 
   - include: 190_update_sysctl_config.yaml
+
+  - include: 200_sync_common_artifacts.yaml

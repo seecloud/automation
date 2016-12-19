@@ -1,0 +1,5 @@
+- name: CCP | Set context
+  shell: "{{ bin_dir }}/kubectl config set-context {{ ccp_namespace }} --namespace {{ ccp_namespace }}"
+
+- name: CCP | Use context
+  shell: "{{ bin_dir }}/kubectl config use-context {{ ccp_namespace }}"

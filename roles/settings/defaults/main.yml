@@ -15,6 +15,9 @@ kube_network_plugin: calico
 # path for storing temporary objects on destination nodes
 local_release_dir: /tmp
 
+# path for storing custom artifact for all nodes
+common_artifacts_path: common_artifacts
+
 # if this is set to true will only download files once
 download_run_once: False
 
@@ -203,6 +206,7 @@ download:
   mode: "{{ file.mode|default(None) }}"
 
 # CCP settings
+ccp_namespace: oss
 pip_packages_folder: "pip_packages"
 ccp_path: fuel-ccp
 ccp_repositories_path: "ccp-repositories"
