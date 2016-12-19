@@ -1,17 +1,8 @@
-- name: Update apt cache
-  apt: update_cache=yes
-  sudo: yes
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-
-- name: Install Gluster
-  apt: name={{ item }}
+- name: Check if Gluster installed
+  shell: rpm -qa | grep -q {{ item }}
   with_items:
-    -  glusterfs-client
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
-
-- name: Install Gluster
-  package: name={{ item }}
-  with_items:
+    - glusterfs-client
     - glusterfs-fuse
-  when: ansible_distribution == 'CentoOS'
+  register: package_installed
+  failed_when: package_installed.rc != 0
+  when: ansible_os_family == "RedHat"
