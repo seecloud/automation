@@ -13,7 +13,7 @@
 #Plan A: no docker-py deps
 - name: Install | Copy etcdctl binary from container
   command: sh -c "/usr/bin/docker rm -f etcdctl-binarycopy;
-           /usr/bin/docker create --name etcdctl-binarycopy {{ etcd_image_repo }}:{{ etcd_image_tag }} &&
+           /usr/bin/docker create --name etcdctl-binarycopy {{ registry|default(None) }}{{ etcd_image_repo }}:{{ etcd_image_tag }} &&
            /usr/bin/docker cp etcdctl-binarycopy:{{ etcd_container_bin_dir }}etcdctl {{ bin_dir }}/etcdctl &&
            /usr/bin/docker rm -f etcdctl-binarycopy"
   when: etcd_deployment_type == "docker"
