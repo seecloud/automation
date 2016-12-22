@@ -28,7 +28,7 @@
   when: >-
       {%- set certs = {'sync': False} -%}
       {%- for server in play_hosts
-         if (not hostvars[server].etcdcert.stat.exists|default(False)) or
+         if (not hostvars[server]['etcdcert']|default(False)) or (not hostvars[server].etcdcert.stat.exists|default(False)) or
          (hostvars[server].etcdcert.stat.checksum|default('') != etcdcert_master.stat.checksum|default('')) -%}
          {%- set _ = certs.update({'sync': True}) -%}
       {%- endfor -%}

@@ -3,9 +3,6 @@
           chdir="{{ local_artifactory_dir }}"
           creates="{{ local_artifactory_dir }}/{{ ccp_path }}"
 
-- name: Install CCP | Update pbr version
-  shell: "sed -i 's@pbr*.*@pbr>=1.8 # Apache-2.0@' {{ local_artifactory_dir }}/{{ ccp_path }}/requirements.txt"
-
 - name: Install CCP | Ensure pip packages folders exist
   file: path="{{ local_artifactory_dir }}/{{ pip_packages_folder }}" state=directory
 
