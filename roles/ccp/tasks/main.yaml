@@ -1,17 +1,15 @@
 - include: 110_copy_artifacts.yaml
+  when: force_sync_ccp_artifacts
 
 - include: 120_install_ccp.yaml
 
 - include: 130_render_ccp_configuration.yaml
 
-- include: 140_build_oss_images.yaml
-  when: build_oss_images|bool
+- include: 140_deploy_oss_images.yaml
+  when: deploy_oss_images|bool
 
-- include: 150_deploy_oss_images.yaml
-  when: build_oss_images|bool and deploy_oss_images|bool
-
-- include: 160_configure_default_namespace.yml
-  when: build_oss_images|bool and deploy_oss_images|bool
+- include: 150_configure_default_namespace.yml
+  when: deploy_oss_images|bool
   delegate_to: "{{item}}"
   delegate_facts: True
   with_items: "{{groups['kube-master']}}"

@@ -1,7 +1,27 @@
+builder:
+  push: False
+registry:
+  address: "{{ registry_name }}:{{ registry_port }}"
+kubernetes:
+  namespace: {{ ccp_namespace }}
+images:
+  namespace: {{ ccp_namespace }}
 repositories:
+  clone: False
   path: {{ local_artifactory_dir }}/{{ ccp_repositories_path }}
   repos:
-  {% for repo in ccp_repos %}
-  - name: {{ repo.name }}
+{% for repo in ccp_repos %}
+    - name: {{ repo.name }}
       git_url: {{ repo.git_url }}
-  {% endfor %}
+{% endfor %}
+roles:
+  infra:
+    - etcd
+  frontend:
+    - devops-portal
+  backend:
+    - ceagle
+    - health-api
+    - health-job
+    - availability-api
+    - availability-watcher

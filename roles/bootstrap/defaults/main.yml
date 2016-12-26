@@ -1,3 +1,4 @@
 ---
 fuel_ccp_repo: https://github.com/openstack/fuel-ccp
 artifacts_path: "{{ local_artifactory_dir }}"
+force_download_artifacts: False

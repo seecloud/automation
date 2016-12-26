@@ -1,22 +1,20 @@
-builder:
-  push: True
 registry:
   address: "{{ registry_name }}:{{ registry_port }}"
 nodes:
 {% for node in groups['k8s-cluster'] %}
-  {{node}}:
+  {{ hostvars[node]['ansible_hostname'] }}:
     roles:
       - infra
       - frontend
       - backend
 {% endfor %}
 kubernetes:
-  namespace: {{ oss_namespace }}
+  namespace: {{ ccp_namespace }}
 images:
-  namespace: {{ oss_namespace }}
+  namespace: {{ ccp_namespace }}
 repositories:
   clone: False
-  path: {{ local_release_dir }}/oss/{{ ccp_repositories_path }}
+  path: {{ ccp_release_dir }}/{{ ccp_repositories_path }}
   repos:
 {% for repo in ccp_repos %}
     - name: {{ repo.name }}
@@ -33,6 +31,7 @@ roles:
     - health-job
     - availability-api
     - availability-watcher
+
 configs:
   elasticsearch:
     hosts:

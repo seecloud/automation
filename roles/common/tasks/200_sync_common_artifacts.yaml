@@ -1,0 +1,15 @@
+- name: Common | Synchronize artifacts
+  synchronize:
+    src: "{{ local_artifactory_dir }}/{{ common_artifacts_path }}"
+    dest: "{{ local_release_dir }}/oss"
+    mode: push
+    recursive: yes
+  register: get_task
+  until: get_task|success
+  retries: 10
+  delay: "{{ retry_stagger | random + 10 }}"
+
+
+- name: Common | Update jinja2
+  command: "/usr/bin/pip install --upgrade jinja2 --no-index \
+         --find-links {{ local_release_dir }}/oss/{{ common_artifacts_path }}"

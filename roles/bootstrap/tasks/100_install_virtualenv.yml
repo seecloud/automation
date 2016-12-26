@@ -1,5 +1,11 @@
+- name: Install CCP | Check if virtualenv exists
+  stat: path="{{ oss_virtualenv }}"
+  register: oss_virtualenv_stat
+
 - name: Install CCP | Create virtualenv
   shell: virtualenv "{{ oss_virtualenv }}"
+  when: oss_virtualenv_stat.stat.exists == False
 
 - name: Install CCP | Activate virtualenv
   shell: . "{{ oss_virtualenv }}"/bin/activate
+  when: oss_virtualenv_stat.stat.exists == False

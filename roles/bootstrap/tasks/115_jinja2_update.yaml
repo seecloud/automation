@@ -1,0 +1,10 @@
+- name: Ensure pip packages folders exist
+  file: path="{{ local_artifactory_dir }}/{{ common_artifacts_path }}" state=directory
+
+- name:  Download Jinja update for Centos 7
+  shell: "{{ oss_virtualenv }}/bin/pip download {{ item }} jinja2"
+  args:
+    chdir: "{{ local_artifactory_dir }}/{{ common_artifacts_path }}"
+  with_items:
+    - " "
+    - "--no-binary :all:"

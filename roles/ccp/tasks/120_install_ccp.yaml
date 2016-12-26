@@ -1,3 +1,16 @@
+- name: CCP | Debug pip dependencies
+  shell: ls -l {{ ccp_release_dir }}/{{ pip_packages_folder }}
+  register: ccp_pip_deps
+
+- name: CCP | List CCP pip artifacts
+  debug: var="{{ item }}"
+  with_items: ccp_pip_deps.stdout_lines
+
+- name: CCP | Preinstall fuel-ccp dependencies
+  shell: "pip install {{ item }} --no-index --find-links /opt/oss/pip_packages/"
+  with_items:
+    - pbr
+
 - name: CCP | Install fuel-ccp
-  shell: pip install {{ local_release_dir }}/oss/{{ ccp_path }} --no-index \
-         --find-links {{ local_release_dir }}/oss/{{ pip_packages_folder }}
+  shell: pip install {{ ccp_release_dir }}/{{ ccp_path }} --no-index \
+         --find-links {{ ccp_release_dir }}/{{ pip_packages_folder }}/

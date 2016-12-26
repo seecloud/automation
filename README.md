@@ -2,7 +2,7 @@
 *Kubernetes deployment based on the roles, taken from [Kargo project](https://github.com/kubernetes-incubator/kargo)  
 #### Requirements for deployment node
 1. CentOS 7 / Ubuntu 16.04
-2. Packages installed: python-pip, python-netaddr
+2. Packages installed: python-pip, python-netaddr, Junja2 >=2.8
 #### Requirements for target nodes
 1. CentOS7 nodes, installed from iso, which was builded by [OSS image builder](https://github.com/seecloud/os-image-builder)  
 2. Access to nodes via ssh key for root user

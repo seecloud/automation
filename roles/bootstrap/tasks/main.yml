@@ -1,13 +1,25 @@
 ---
+- include: 000_cleanup_artifacts.yml
+  when: force_download_artifacts
+
 - include: 100_install_virtualenv.yml
 
 - include: 105_upgrade_requirements.yml
 
+- include: 106_prepare_folders.yml
+
 - include: 110_download.yml file={{ downloads[item] }}
   with_items: "{{ download_items }}"
+
+- include: 115_jinja2_update.yaml
 
 - include: 120_prepare_ccp.yaml
 
 - include: 130_install_ccp.yml artifacts_path="{{ local_artifactory_dir }}"
 
 - include: 140_fetch_ccp_repositories.yml
+
+- include: 150_build_oss_images.yml
+  when: build_oss_images|bool
+
+- include: 160_save_ccp_images.yml
